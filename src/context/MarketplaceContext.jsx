@@ -444,9 +444,13 @@ export const MarketplaceProvider = ({ children }) => {
           avatar: user.user_metadata?.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
           banned: false
         };
+        localStorage.removeItem('isLocalSession');
         setCurrentUser(matchedUser);
       } else {
-        setCurrentUser(null);
+        const isLocal = localStorage.getItem('isLocalSession');
+        if (!isLocal) {
+          setCurrentUser(null);
+        }
       }
     });
 
@@ -538,6 +542,7 @@ export const MarketplaceProvider = ({ children }) => {
     if (email.toLowerCase() === 'admin@happy.com') {
       const foundUser = users.find(u => u.email.toLowerCase() === 'admin@happy.com');
       if (foundUser) {
+        localStorage.setItem('isLocalSession', 'true');
         setCurrentUser(foundUser);
         showToast('Logged in as Demo Admin!', 'success');
         return true;
@@ -557,6 +562,7 @@ export const MarketplaceProvider = ({ children }) => {
           showToast('This account has been banned by the Administrator.', 'error');
           return false;
         }
+        localStorage.setItem('isLocalSession', 'true');
         setCurrentUser(foundUser);
         showToast(`Welcome back (Local Session): ${foundUser.name}!`, 'success');
         return true;
@@ -583,6 +589,7 @@ export const MarketplaceProvider = ({ children }) => {
       banned: false
     };
 
+    localStorage.removeItem('isLocalSession');
     setCurrentUser(matchedUser);
     showToast(`Welcome back, ${matchedUser.name}!`, 'success');
     return true;
@@ -592,6 +599,7 @@ export const MarketplaceProvider = ({ children }) => {
     // 1. Check if user already exists
     let foundUser = users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.role === role);
     if (foundUser) {
+      localStorage.setItem('isLocalSession', 'true');
       setCurrentUser(foundUser);
       showToast(`Google Login Successful! Welcome ${foundUser.name}!`, 'success');
       return true;
@@ -619,7 +627,7 @@ export const MarketplaceProvider = ({ children }) => {
         description: 'A brand new shop filled with cute items.',
         logo: 'https://images.unsplash.com/photo-1596495578065-6e076b8a9dad?w=200&auto=format&fit=crop&q=80',
         banner: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&auto=format&fit=crop&q=80',
-        category: 'Other',
+        category: 'T-Shirts',
         contact: email,
         social: {},
         address: 'Main St, Cloud Town',
@@ -632,6 +640,7 @@ export const MarketplaceProvider = ({ children }) => {
       setShops(prev => [...prev, newShop]);
     }
 
+    localStorage.setItem('isLocalSession', 'true');
     setUsers(prev => [...prev, newUser]);
     setCurrentUser(newUser);
     showToast(`Google Login Successful! Welcome ${formattedName}!`, 'success');
@@ -640,6 +649,7 @@ export const MarketplaceProvider = ({ children }) => {
 
   const logout = async () => {
     await supabase.auth.signOut();
+    localStorage.removeItem('isLocalSession');
     setCurrentUser(null);
     setCart([]);
     showToast('Logged out successfully. See you soon!', 'info');

@@ -22,7 +22,7 @@ export default function Auth() {
 
   // Seller specific shop fields
   const [shopName, setShopName] = useState('');
-  const [shopCategory, setShopCategory] = useState('Plushies & Toys');
+  const [shopCategory, setShopCategory] = useState('T-Shirts');
   const [shopDescription, setShopDescription] = useState('');
   const [shopAddress, setShopAddress] = useState('');
   const [shopContact, setShopContact] = useState('');
@@ -199,10 +199,11 @@ export default function Auth() {
                     onChange={(e) => setShopCategory(e.target.value)}
                     className="form-control"
                   >
-                    <option value="Plushies & Toys">Plushies & Toys</option>
-                    <option value="Stationery">Stationery</option>
-                    <option value="Home & Kitchen">Home & Kitchen</option>
-                    <option value="Jewelry & Accessories">Jewelry & Accessories</option>
+                    <option value="T-Shirts">T-Shirts</option>
+                    <option value="Gifts">Gifts</option>
+                    <option value="Posters">Posters</option>
+                    <option value="Birthday Kit">Birthday Kit</option>
+                    <option value="Caps">Caps</option>
                   </select>
                 </div>
 
