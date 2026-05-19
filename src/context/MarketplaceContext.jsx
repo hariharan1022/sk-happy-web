@@ -446,9 +446,56 @@ export const MarketplaceProvider = ({ children }) => {
             name = profile.name || name;
             role = profile.role || role;
             shopId = profile.shop_id || shopId;
+          } else {
+            // Self-heal: insert profile if missing
+            await supabase.from('profiles').insert([{
+              id: user.id,
+              name,
+              email: user.email,
+              role,
+              shop_id: shopId
+            }]);
+          }
+
+          // Self-heal: insert shop if missing
+          if (role === 'seller' && shopId) {
+            const { data: dbShop } = await supabase
+              .from('shops')
+              .select('*')
+              .eq('id', shopId)
+              .maybeSingle();
+
+            if (!dbShop) {
+              const defaultShop = {
+                id: shopId,
+                name: `${name}'s Cute Shop`,
+                description: 'Welcome to my cute shop!',
+                logo: 'https://images.unsplash.com/photo-1596495578065-6e076b8a9dad?w=200&auto=format&fit=crop&q=80',
+                banner: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&auto=format&fit=crop&q=80',
+                category: 'T-Shirts',
+                contact: user.email,
+                social: {},
+                address: 'Main St, Cloud Town',
+                sellerId: user.id,
+                status: 'approved',
+                rating: 5.0,
+                followers: 0,
+                reviews: []
+              };
+
+              await supabase.from('shops').insert([defaultShop]);
+
+              // Update local shops state
+              setShops(prev => {
+                if (!prev.some(s => s.id === shopId)) {
+                  return [...prev, defaultShop];
+                }
+                return prev;
+              });
+            }
           }
         } catch (err) {
-          console.warn('Failed to fetch user profile:', err);
+          console.warn('Failed to fetch/heal user profile:', err);
         }
 
         const matchedUser = {
@@ -742,7 +789,22 @@ export const MarketplaceProvider = ({ children }) => {
       };
 
       try {
-        await supabase.from('shops').insert([newShop]);
+        await supabase.from('shops').insert([{
+          id: newShop.id,
+          name: newShop.name,
+          description: newShop.description,
+          logo: newShop.logo,
+          banner: newShop.banner,
+          category: newShop.category,
+          contact: newShop.contact,
+          social: newShop.social,
+          address: newShop.address,
+          "sellerId": user.id,
+          status: newShop.status,
+          rating: Number(newShop.rating),
+          followers: Number(newShop.followers),
+          reviews: newShop.reviews
+        }]);
       } catch (err) {
         console.warn('Supabase shops table insert failed:', err);
       }
