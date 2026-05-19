@@ -194,6 +194,43 @@ export default function Navbar() {
             </div>
           </form>
 
+          {/* Condensed Mobile Actions Row */}
+          <div className="mobile-actions-row">
+            {/* Theme Toggle */}
+            <button onClick={toggleDarkMode} className="mobile-action-card-btn" aria-label="Toggle Theme">
+              {theme === 'light' ? <Moon size={18} /> : <Sun size={18} />}
+              <span>Theme</span>
+            </button>
+
+            {/* Wishlist */}
+            <Link to="/profile?tab=wishlist" onClick={() => setMobileMenuOpen(false)} className="mobile-action-card-btn">
+              <Heart size={18} />
+              <span>Wishlist</span>
+              {wishlistCount > 0 && <span className="mobile-pill-badge badge-sec">{wishlistCount}</span>}
+            </Link>
+
+            {/* Cart */}
+            <Link to="/checkout?step=cart" onClick={() => setMobileMenuOpen(false)} className="mobile-action-card-btn">
+              <ShoppingBag size={18} />
+              <span>Cart</span>
+              {cartCount > 0 && <span className="mobile-pill-badge badge-prim">{cartCount}</span>}
+            </Link>
+          </div>
+
+          {/* Unread notifications inside drawer */}
+          {unreadNotifs.length > 0 && (
+            <div className="mobile-notif-section">
+              <span className="mobile-notif-title">🔔 Notifications ({unreadNotifs.length})</span>
+              <ul className="notif-list">
+                {unreadNotifs.slice(0, 3).map((notif) => (
+                  <li key={notif.id} className={`notif-item ${notif.type}`}>
+                    {notif.message}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
           <ul className="mobile-drawer-links">
             <li><Link to="/" onClick={() => setMobileMenuOpen(false)}>Home</Link></li>
             <li><Link to="/?category=T-Shirts" onClick={() => setMobileMenuOpen(false)}>T-Shirts</Link></li>
@@ -528,6 +565,9 @@ export default function Navbar() {
           .nav-search-form {
             display: none;
           }
+          .nav-actions {
+            display: none !important;
+          }
           .mobile-menu-toggle-btn {
             display: block;
           }
@@ -544,7 +584,7 @@ export default function Navbar() {
             border-bottom: 1px solid var(--border-color);
             z-index: 999;
             box-shadow: var(--shadow-lg);
-            padding: 30px 20px;
+            padding: 25px 20px;
             overflow-y: auto;
             animation: slideDown 0.25s ease-out;
           }
@@ -554,6 +594,68 @@ export default function Navbar() {
           }
           .mobile-search-form {
             margin-bottom: 20px;
+          }
+          .mobile-actions-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 25px;
+          }
+          .mobile-action-card-btn {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-sm);
+            padding: 12px 6px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            color: var(--text-secondary);
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            position: relative;
+            text-align: center;
+          }
+          .mobile-action-card-btn:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+            background: var(--primary-light);
+          }
+          .mobile-pill-badge {
+            position: absolute;
+            top: 5px;
+            right: 15px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: white;
+            background: var(--primary);
+            border-radius: 50%;
+            min-width: 16px;
+            height: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2px;
+          }
+          .mobile-pill-badge.badge-sec {
+            background: var(--secondary);
+          }
+          .mobile-notif-section {
+            margin-bottom: 25px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius-sm);
+            padding: 12px;
+          }
+          .mobile-notif-title {
+            font-size: 0.8rem;
+            font-weight: 700;
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-primary);
           }
           .mobile-drawer-links {
             list-style: none;
