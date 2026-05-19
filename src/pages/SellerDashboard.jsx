@@ -43,6 +43,18 @@ export default function SellerDashboard() {
   const [shopBannerForm, setShopBannerForm] = useState('');
   const [shopContactForm, setShopContactForm] = useState('');
   const [shopAddressForm, setShopAddressForm] = useState('');
+  const [shopCategoryForm, setShopCategoryForm] = useState('T-Shirts');
+
+  const handleFileChange = (e, callback) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        callback(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
 
   // Redirect if not seller
   useEffect(() => {
@@ -62,6 +74,7 @@ export default function SellerDashboard() {
       setShopBannerForm(sellerShop.banner);
       setShopContactForm(sellerShop.contact);
       setShopAddressForm(sellerShop.address);
+      setShopCategoryForm(sellerShop.category || 'T-Shirts');
     }
   }, [sellerShop]);
 
@@ -103,7 +116,7 @@ export default function SellerDashboard() {
       description: shopDescForm,
       logo: shopLogoForm,
       banner: shopBannerForm,
-      category: 'T-Shirts',
+      category: shopCategoryForm,
       contact: shopContactForm,
       address: shopAddressForm
     });
@@ -118,6 +131,7 @@ export default function SellerDashboard() {
       description: shopDescForm,
       logo: shopLogoForm,
       banner: shopBannerForm,
+      category: shopCategoryForm,
       contact: shopContactForm,
       address: shopAddressForm
     });
@@ -247,28 +261,66 @@ export default function SellerDashboard() {
 
             <div className="grid-cols-2">
               <div className="form-group">
-                <label className="form-label">Logo URL</label>
-                <input 
-                  type="text" 
-                  placeholder="Paste direct image link" 
-                  value={shopLogoForm}
-                  onChange={(e) => setShopLogoForm(e.target.value)}
-                  className="form-control"
-                />
+                <label className="form-label">Logo Image</label>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <input 
+                    type="text" 
+                    placeholder="Paste logo URL or upload from device" 
+                    value={shopLogoForm}
+                    onChange={(e) => setShopLogoForm(e.target.value)}
+                    className="form-control"
+                    style={{ flex: 1 }}
+                  />
+                  <label className="btn btn-secondary" style={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', margin: 0, padding: '0 15px', whiteSpace: 'nowrap' }}>
+                    📂 Upload
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      style={{ display: 'none' }}
+                      onChange={(e) => handleFileChange(e, setShopLogoForm)}
+                    />
+                  </label>
+                </div>
               </div>
               <div className="form-group">
-                <label className="form-label">Banner URL</label>
-                <input 
-                  type="text" 
-                  placeholder="Paste direct image link" 
-                  value={shopBannerForm}
-                  onChange={(e) => setShopBannerForm(e.target.value)}
-                  className="form-control"
-                />
+                <label className="form-label">Banner Image</label>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <input 
+                    type="text" 
+                    placeholder="Paste banner URL or upload from device" 
+                    value={shopBannerForm}
+                    onChange={(e) => setShopBannerForm(e.target.value)}
+                    className="form-control"
+                    style={{ flex: 1 }}
+                  />
+                  <label className="btn btn-secondary" style={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', margin: 0, padding: '0 15px', whiteSpace: 'nowrap' }}>
+                    📂 Upload
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      style={{ display: 'none' }}
+                      onChange={(e) => handleFileChange(e, setShopBannerForm)}
+                    />
+                  </label>
+                </div>
               </div>
             </div>
 
-            <div className="grid-cols-2">
+            <div className="grid-cols-3">
+              <div className="form-group">
+                <label className="form-label">Shop Category</label>
+                <select
+                  value={shopCategoryForm}
+                  onChange={(e) => setShopCategoryForm(e.target.value)}
+                  className="form-control"
+                >
+                  <option value="T-Shirts">T-Shirts</option>
+                  <option value="Gifts">Gifts</option>
+                  <option value="Posters">Posters</option>
+                  <option value="Birthday Kit">Birthday Kit</option>
+                  <option value="Caps">Caps</option>
+                </select>
+              </div>
               <div className="form-group">
                 <label className="form-label">Support Email / Contact</label>
                 <input 
@@ -627,26 +679,64 @@ export default function SellerDashboard() {
 
                 <div className="grid-cols-2">
                   <div className="form-group">
-                    <label className="form-label">Shop Logo Image URL</label>
-                    <input 
-                      type="text" 
-                      value={shopLogoForm} 
-                      onChange={(e) => setShopLogoForm(e.target.value)}
-                      className="form-control"
-                    />
+                    <label className="form-label">Shop Logo Image</label>
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                      <input 
+                        type="text" 
+                        value={shopLogoForm} 
+                        onChange={(e) => setShopLogoForm(e.target.value)}
+                        className="form-control"
+                        style={{ flex: 1 }}
+                      />
+                      <label className="btn btn-secondary" style={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', margin: 0, padding: '0 15px', whiteSpace: 'nowrap' }}>
+                        📂 Upload
+                        <input 
+                          type="file" 
+                          accept="image/*" 
+                          style={{ display: 'none' }}
+                          onChange={(e) => handleFileChange(e, setShopLogoForm)}
+                        />
+                      </label>
+                    </div>
                   </div>
                   <div className="form-group">
-                    <label className="form-label">Shop Banner Cover URL</label>
-                    <input 
-                      type="text" 
-                      value={shopBannerForm} 
-                      onChange={(e) => setShopBannerForm(e.target.value)}
-                      className="form-control"
-                    />
+                    <label className="form-label">Shop Banner Cover</label>
+                    <div style={{ display: 'flex', gap: '10px' }}>
+                      <input 
+                        type="text" 
+                        value={shopBannerForm} 
+                        onChange={(e) => setShopBannerForm(e.target.value)}
+                        className="form-control"
+                        style={{ flex: 1 }}
+                      />
+                      <label className="btn btn-secondary" style={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', margin: 0, padding: '0 15px', whiteSpace: 'nowrap' }}>
+                        📂 Upload
+                        <input 
+                          type="file" 
+                          accept="image/*" 
+                          style={{ display: 'none' }}
+                          onChange={(e) => handleFileChange(e, setShopBannerForm)}
+                        />
+                      </label>
+                    </div>
                   </div>
                 </div>
 
-                <div className="grid-cols-2">
+                <div className="grid-cols-3">
+                  <div className="form-group">
+                    <label className="form-label">Shop Category</label>
+                    <select
+                      value={shopCategoryForm}
+                      onChange={(e) => setShopCategoryForm(e.target.value)}
+                      className="form-control"
+                    >
+                      <option value="T-Shirts">T-Shirts</option>
+                      <option value="Gifts">Gifts</option>
+                      <option value="Posters">Posters</option>
+                      <option value="Birthday Kit">Birthday Kit</option>
+                      <option value="Caps">Caps</option>
+                    </select>
+                  </div>
                   <div className="form-group">
                     <label className="form-label">Business Contact Email</label>
                     <input 
@@ -771,14 +861,40 @@ export default function SellerDashboard() {
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">Images URLs (comma separated links)</label>
-                  <input 
-                    type="text" 
-                    value={prodImages} 
-                    onChange={(e) => setProdImages(e.target.value)}
-                    className="form-control"
-                    required
-                  />
+                  <label className="form-label">Product Images</label>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+                    <input 
+                      type="text" 
+                      placeholder="Paste comma-separated URLs or upload below"
+                      value={prodImages} 
+                      onChange={(e) => setProdImages(e.target.value)}
+                      className="form-control"
+                      required
+                    />
+                    <label className="btn btn-secondary" style={{ alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', cursor: 'pointer', gap: '8px', margin: 0 }}>
+                      📂 Upload Photos from Device
+                      <input 
+                        type="file" 
+                        accept="image/*" 
+                        multiple 
+                        style={{ display: 'none' }}
+                        onChange={(e) => {
+                          const files = Array.from(e.target.files);
+                          const promises = files.map(file => {
+                            return new Promise((resolve) => {
+                              const reader = new FileReader();
+                              reader.onloadend = () => resolve(reader.result);
+                              reader.readAsDataURL(file);
+                            });
+                          });
+                          Promise.all(promises).then(newImages => {
+                            const currentImages = prodImages ? prodImages.split(',').map(i => i.trim()).filter(Boolean) : [];
+                            setProdImages([...currentImages, ...newImages].join(', '));
+                          });
+                        }}
+                      />
+                    </label>
+                  </div>
                 </div>
 
                 <div className="grid-cols-2">
