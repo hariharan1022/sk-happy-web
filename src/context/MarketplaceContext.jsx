@@ -649,10 +649,28 @@ export const MarketplaceProvider = ({ children }) => {
       console.warn('Failed to fetch user profile in login:', err);
     }
 
-    if (userRole !== role) {
-      showToast(`Invalid portal. This account is registered as a ${userRole}.`, 'error');
+    if (role === 'admin' && userRole !== 'admin') {
+      showToast('Unauthorized access. Admin portal requires admin privileges.', 'error');
       await supabase.auth.signOut();
       return false;
+    }
+
+    if (role === 'seller' && userRole === 'buyer') {
+      // Auto-upgrade buyer to seller when they access the Seller Hub
+      userRole = 'seller';
+      try {
+        await supabase
+          .from('profiles')
+          .update({ role: 'seller' })
+          .eq('id', user.id);
+
+        await supabase.auth.updateUser({
+          data: { role: 'seller' }
+        });
+        showToast('Your account has been upgraded to Seller!', 'success');
+      } catch (err) {
+        console.warn('Failed to upgrade user to seller on login:', err);
+      }
     }
 
     const matchedUser = {
