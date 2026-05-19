@@ -431,9 +431,25 @@ export const MarketplaceProvider = ({ children }) => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
         const user = session.user;
-        const name = user.user_metadata?.name || 'User';
-        const role = user.user_metadata?.role || 'buyer';
-        const shopId = user.user_metadata?.shopId || null;
+        let name = user.user_metadata?.name || 'User';
+        let role = user.user_metadata?.role || 'buyer';
+        let shopId = user.user_metadata?.shopId || null;
+
+        try {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id)
+            .maybeSingle();
+
+          if (profile) {
+            name = profile.name || name;
+            role = profile.role || role;
+            shopId = profile.shop_id || shopId;
+          }
+        } catch (err) {
+          console.warn('Failed to fetch user profile:', err);
+        }
 
         const matchedUser = {
           id: user.id,
@@ -444,13 +460,9 @@ export const MarketplaceProvider = ({ children }) => {
           avatar: user.user_metadata?.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
           banned: false
         };
-        localStorage.removeItem('isLocalSession');
         setCurrentUser(matchedUser);
       } else {
-        const isLocal = localStorage.getItem('isLocalSession');
-        if (!isLocal) {
-          setCurrentUser(null);
-        }
+        setCurrentUser(null);
       }
     });
 
@@ -542,7 +554,6 @@ export const MarketplaceProvider = ({ children }) => {
     if (email.toLowerCase() === 'admin@happy.com') {
       const foundUser = users.find(u => u.email.toLowerCase() === 'admin@happy.com');
       if (foundUser) {
-        localStorage.setItem('isLocalSession', 'true');
         setCurrentUser(foundUser);
         showToast('Logged in as Demo Admin!', 'success');
         return true;
@@ -562,7 +573,6 @@ export const MarketplaceProvider = ({ children }) => {
           showToast('This account has been banned by the Administrator.', 'error');
           return false;
         }
-        localStorage.setItem('isLocalSession', 'true');
         setCurrentUser(foundUser);
         showToast(`Welcome back (Local Session): ${foundUser.name}!`, 'success');
         return true;
@@ -572,7 +582,26 @@ export const MarketplaceProvider = ({ children }) => {
     }
 
     const user = data.user;
-    const userRole = user.user_metadata?.role || 'buyer';
+    let userRole = user.user_metadata?.role || 'buyer';
+    let userShopId = user.user_metadata?.shopId || null;
+    let userName = user.user_metadata?.name || 'User';
+
+    try {
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('*')
+        .eq('id', user.id)
+        .maybeSingle();
+
+      if (profile) {
+        userName = profile.name || userName;
+        userRole = profile.role || userRole;
+        userShopId = profile.shop_id || userShopId;
+      }
+    } catch (err) {
+      console.warn('Failed to fetch user profile in login:', err);
+    }
+
     if (userRole !== role) {
       showToast(`Invalid portal. This account is registered as a ${userRole}.`, 'error');
       await supabase.auth.signOut();
@@ -581,15 +610,14 @@ export const MarketplaceProvider = ({ children }) => {
 
     const matchedUser = {
       id: user.id,
-      name: user.user_metadata?.name || 'User',
+      name: userName,
       email: user.email,
       role: userRole,
-      shopId: user.user_metadata?.shopId || null,
+      shopId: userShopId,
       avatar: user.user_metadata?.avatar || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
       banned: false
     };
 
-    localStorage.removeItem('isLocalSession');
     setCurrentUser(matchedUser);
     showToast(`Welcome back, ${matchedUser.name}!`, 'success');
     return true;
@@ -599,7 +627,6 @@ export const MarketplaceProvider = ({ children }) => {
     // 1. Check if user already exists
     let foundUser = users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.role === role);
     if (foundUser) {
-      localStorage.setItem('isLocalSession', 'true');
       setCurrentUser(foundUser);
       showToast(`Google Login Successful! Welcome ${foundUser.name}!`, 'success');
       return true;
@@ -627,7 +654,7 @@ export const MarketplaceProvider = ({ children }) => {
         description: 'A brand new shop filled with cute items.',
         logo: 'https://images.unsplash.com/photo-1596495578065-6e076b8a9dad?w=200&auto=format&fit=crop&q=80',
         banner: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&auto=format&fit=crop&q=80',
-        category: 'T-Shirts',
+        category: 'Other',
         contact: email,
         social: {},
         address: 'Main St, Cloud Town',
@@ -640,7 +667,6 @@ export const MarketplaceProvider = ({ children }) => {
       setShops(prev => [...prev, newShop]);
     }
 
-    localStorage.setItem('isLocalSession', 'true');
     setUsers(prev => [...prev, newUser]);
     setCurrentUser(newUser);
     showToast(`Google Login Successful! Welcome ${formattedName}!`, 'success');
@@ -649,7 +675,6 @@ export const MarketplaceProvider = ({ children }) => {
 
   const logout = async () => {
     await supabase.auth.signOut();
-    localStorage.removeItem('isLocalSession');
     setCurrentUser(null);
     setCart([]);
     showToast('Logged out successfully. See you soon!', 'info');
@@ -947,7 +972,7 @@ export const MarketplaceProvider = ({ children }) => {
   };
 
   // Seller Shop Settings
-  const createShop = (shopData) => {
+  const createShop = async (shopData) => {
     if (!currentUser || currentUser.role !== 'seller') return;
     const newShop = {
       id: 'shop-' + Date.now(),
@@ -966,6 +991,44 @@ export const MarketplaceProvider = ({ children }) => {
       reviews: []
     };
 
+    try {
+      const { error: shopErr } = await supabase.from('shops').insert([{
+        id: newShop.id,
+        name: newShop.name,
+        description: newShop.description,
+        logo: newShop.logo,
+        banner: newShop.banner,
+        category: newShop.category,
+        contact: newShop.contact,
+        social: newShop.social,
+        address: newShop.address,
+        sellerId: newShop.sellerId,
+        status: newShop.status,
+        rating: Number(newShop.rating),
+        followers: Number(newShop.followers),
+        reviews: newShop.reviews
+      }]);
+
+      if (shopErr) {
+        console.warn('Supabase create shop error:', shopErr.message);
+      }
+
+      const { error: profileErr } = await supabase
+        .from('profiles')
+        .update({ shop_id: newShop.id })
+        .eq('id', currentUser.id);
+
+      if (profileErr) {
+        console.warn('Supabase profile shop_id update error:', profileErr.message);
+      }
+      
+      await supabase.auth.updateUser({
+        data: { shopId: newShop.id }
+      });
+    } catch (err) {
+      console.warn('Supabase createShop exception:', err);
+    }
+
     setShops(prev => [...prev, newShop]);
     setUsers(prev => prev.map(u => u.id === currentUser.id ? { ...u, shopId: newShop.id } : u));
     setCurrentUser(prev => ({ ...prev, shopId: newShop.id }));
@@ -973,7 +1036,28 @@ export const MarketplaceProvider = ({ children }) => {
     showToast('Shop registered! Awaiting admin approval.', 'success');
   };
 
-  const updateShop = (shopId, shopData) => {
+  const updateShop = async (shopId, shopData) => {
+    try {
+      const { error } = await supabase
+        .from('shops')
+        .update({
+          name: shopData.name,
+          description: shopData.description,
+          logo: shopData.logo,
+          banner: shopData.banner,
+          category: shopData.category,
+          contact: shopData.contact,
+          address: shopData.address
+        })
+        .eq('id', shopId);
+
+      if (error) {
+        console.warn('Supabase shop update error:', error.message);
+      }
+    } catch (err) {
+      console.warn('Supabase updateShop exception:', err);
+    }
+
     setShops(prev => prev.map(s => s.id === shopId ? { ...s, ...shopData } : s));
     showToast('Shop details updated successfully!', 'success');
   };
