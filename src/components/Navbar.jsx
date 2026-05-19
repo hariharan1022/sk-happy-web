@@ -70,10 +70,11 @@ export default function Navbar() {
         <ul className="nav-links">
           <li><Link to="/">Home</Link></li>
           <li><Link to="/?category=T-Shirts">T-Shirts</Link></li>
-          <li><Link to="/?category=Gifts">Gifts</Link></li>
-          <li><Link to="/?category=Posters">Posters</Link></li>
           <li><Link to="/?category=Birthday%20Kit">Birthday Kit</Link></li>
           <li><Link to="/?category=Caps">Caps</Link></li>
+          <li><Link to="/?category=Posters">Posters</Link></li>
+          <li><Link to="/?category=Gifts">Gifts</Link></li>
+          <li><Link to="/about">About</Link></li>
         </ul>
 
         {/* Right Nav Actions */}
@@ -196,10 +197,11 @@ export default function Navbar() {
           <ul className="mobile-drawer-links">
             <li><Link to="/" onClick={() => setMobileMenuOpen(false)}>Home</Link></li>
             <li><Link to="/?category=T-Shirts" onClick={() => setMobileMenuOpen(false)}>T-Shirts</Link></li>
-            <li><Link to="/?category=Gifts" onClick={() => setMobileMenuOpen(false)}>Gifts</Link></li>
-            <li><Link to="/?category=Posters" onClick={() => setMobileMenuOpen(false)}>Posters</Link></li>
             <li><Link to="/?category=Birthday%20Kit" onClick={() => setMobileMenuOpen(false)}>Birthday Kit</Link></li>
             <li><Link to="/?category=Caps" onClick={() => setMobileMenuOpen(false)}>Caps</Link></li>
+            <li><Link to="/?category=Posters" onClick={() => setMobileMenuOpen(false)}>Posters</Link></li>
+            <li><Link to="/?category=Gifts" onClick={() => setMobileMenuOpen(false)}>Gifts</Link></li>
+            <li><Link to="/about" onClick={() => setMobileMenuOpen(false)}>About Us</Link></li>
             <hr className="dropdown-divider" />
             {currentUser ? (
               <>
@@ -531,13 +533,24 @@ export default function Navbar() {
           }
           .mobile-drawer {
             display: block;
-            position: absolute;
+            position: fixed;
             top: 80px;
-            left: 10px;
-            right: 10px;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: var(--bg-nav);
+            backdrop-filter: var(--glass-blur);
+            -webkit-backdrop-filter: var(--glass-blur);
+            border-bottom: 1px solid var(--border-color);
             z-index: 999;
             box-shadow: var(--shadow-lg);
-            padding: 20px;
+            padding: 30px 20px;
+            overflow-y: auto;
+            animation: slideDown 0.25s ease-out;
+          }
+          @keyframes slideDown {
+            from { transform: translateY(-15px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
           }
           .mobile-search-form {
             margin-bottom: 20px;

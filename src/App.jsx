@@ -4,6 +4,7 @@ import { MarketplaceProvider } from './context/MarketplaceContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
+import About from './pages/About';
 import Auth from './pages/Auth';
 import Chat from './pages/Chat';
 import ProductDetails from './pages/ProductDetails';
@@ -22,6 +23,7 @@ export default function App() {
           <main className="main-content">
             <Routes>
               <Route path="/" element={<Home />} />
+              <Route path="/about" element={<About />} />
               <Route path="/auth" element={<Auth />} />
               <Route path="/chat" element={<Chat />} />
               <Route path="/product/:productId" element={<ProductDetails />} />

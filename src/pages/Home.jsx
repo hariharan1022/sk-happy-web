@@ -1158,8 +1158,15 @@ export default function Home() {
             grid-template-columns: 1fr;
             text-align: center;
           }
-          .hero-badge, .hero-cta-buttons {
+          .hero-badge {
+            display: inline-flex;
+            margin: 0 auto 15px;
+          }
+          .hero-cta-buttons {
+            display: flex;
+            flex-wrap: wrap;
             justify-content: center;
+            gap: 15px;
             margin: 0 auto;
           }
           .hero-text-block h1 {
@@ -1167,6 +1174,11 @@ export default function Home() {
           }
           .hero-art-block {
             order: -1;
+            margin-bottom: 20px;
+          }
+          .hero-main-img {
+            max-width: 320px;
+            margin: 0 auto;
           }
           .slider-wrapper {
             height: auto;
@@ -1186,25 +1198,99 @@ export default function Home() {
           }
           .flash-sale-banner {
             grid-template-columns: 1fr;
-          }
-          .flash-grid {
-            grid-template-columns: repeat(2, 1fr);
+            padding: 20px;
           }
           .shops-list-grid {
             grid-template-columns: 1fr 1fr;
           }
-          .recent-items-grid {
-            grid-template-columns: repeat(3, 1fr);
-          }
         }
+        
         @media (max-width: 768px) {
+          .home-container {
+            overflow-x: hidden;
+          }
+          .hero-section {
+            overflow: hidden;
+            padding-top: 20px;
+            padding-bottom: 20px;
+          }
+          .glass-bubble {
+            width: 45px;
+            height: 45px;
+            font-size: 1.4rem;
+          }
+          .hero-text-block h1 {
+            font-size: 2rem;
+          }
+          .hero-text-block p {
+            font-size: 0.95rem;
+            margin-bottom: 20px;
+          }
+          .hero-cta-buttons {
+            flex-direction: column;
+            width: 100%;
+            max-width: 280px;
+          }
+          .hero-cta-buttons .btn {
+            width: 100%;
+            text-align: center;
+          }
+          
+          /* Horizontal Swiping Right to Left Scroll Styles */
+          .catalog-grid, .flash-grid, .recent-items-grid {
+            display: flex !important;
+            overflow-x: auto !important;
+            scroll-snap-type: x mandatory;
+            gap: 16px;
+            padding: 10px 5px 20px 5px !important;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+            scrollbar-color: var(--primary-light) transparent;
+          }
+          .catalog-grid::-webkit-scrollbar, 
+          .flash-grid::-webkit-scrollbar, 
+          .recent-items-grid::-webkit-scrollbar {
+            height: 6px;
+          }
+          .catalog-grid::-webkit-scrollbar-thumb,
+          .flash-grid::-webkit-scrollbar-thumb,
+          .recent-items-grid::-webkit-scrollbar-thumb {
+            background-color: var(--primary-light);
+            border-radius: 99px;
+          }
+          
+          /* Flex card sizing for swiping */
+          .catalog-grid .product-card,
+          .flash-grid .flash-item,
+          .recent-items-grid .recent-item-card {
+            flex: 0 0 230px !important;
+            max-width: 230px !important;
+            scroll-snap-align: start;
+            margin-bottom: 0 !important;
+          }
+          
+          .flash-off-badge {
+            top: -24px;
+            font-size: 0.65rem;
+          }
+          
           .categories-grid {
             gap: 10px;
+            justify-content: flex-start;
+            overflow-x: auto;
+            flex-wrap: nowrap;
+            padding-bottom: 10px;
+            -webkit-overflow-scrolling: touch;
+          }
+          .categories-grid::-webkit-scrollbar {
+            height: 4px;
           }
           .category-circle-card {
-            padding: 10px 18px;
+            flex: 0 0 auto;
+            padding: 8px 16px;
             font-size: 0.85rem;
           }
+          
           .catalog-controls {
             flex-direction: column;
             gap: 15px;
@@ -1216,9 +1302,6 @@ export default function Home() {
           }
           .shops-list-grid {
             grid-template-columns: 1fr;
-          }
-          .recent-items-grid {
-            grid-template-columns: repeat(2, 1fr);
           }
         }
       `}} />
