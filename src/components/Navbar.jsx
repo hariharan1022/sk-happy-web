@@ -44,142 +44,149 @@ export default function Navbar() {
   return (
     <>
       <nav className="navbar">
-        <div className="container nav-wrapper">
-        {/* Logo */}
-        <Link to="/" className="nav-logo" onClick={() => setMobileMenuOpen(false)}>
-          <span className="logo-sparkle">✨</span>
-          <span className="logo-text">SK Happy Little Things</span>
-        </Link>
+        {/* Row 1: Logo | Search | Actions */}
+        <div className="nav-row-top">
+          <div className="container top-nav-inner">
+            {/* Logo */}
+            <Link to="/" className="nav-logo" onClick={() => setMobileMenuOpen(false)}>
+              <span className="logo-sparkle">✨</span>
+              <span className="logo-text">SK Happy Little Things</span>
+            </Link>
 
-        {/* Search Bar */}
-        <form onSubmit={handleSearchSubmit} className="nav-search-form">
-          <div className="search-input-wrapper">
-            <input 
-              type="text" 
-              placeholder="Search cute things..." 
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="search-input"
-            />
-            <button type="submit" className="search-btn">
-              <Search size={18} />
-            </button>
-          </div>
-        </form>
-
-        {/* Desktop Menu */}
-        <ul className="nav-links">
-          <li><Link to="/">Home</Link></li>
-          <li><Link to="/?category=T-Shirts">T-Shirts</Link></li>
-          <li><Link to="/?category=Birthday%20Kit">Birthday Kit</Link></li>
-          <li><Link to="/?category=Caps">Caps</Link></li>
-          <li><Link to="/?category=Posters">Posters</Link></li>
-          <li><Link to="/?category=Gifts">Gifts</Link></li>
-          <li><Link to="/about">About</Link></li>
-        </ul>
-
-        {/* Right Nav Actions */}
-        <div className="nav-actions">
-          {/* Dark Mode Toggle */}
-          <button onClick={toggleDarkMode} className="action-icon-btn theme-toggle-btn" aria-label="Toggle Theme">
-            {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
-          </button>
-
-          {/* Wishlist */}
-          <Link to="/profile?tab=wishlist" className="action-icon-btn badge-container" aria-label="Wishlist">
-            <Heart size={20} />
-            {wishlistCount > 0 && <span className="icon-badge badge-sec">{wishlistCount}</span>}
-          </Link>
-
-          {/* Cart */}
-          <Link to="/checkout?step=cart" className="action-icon-btn badge-container" aria-label="Cart">
-            <ShoppingBag size={20} />
-            {cartCount > 0 && <span className="icon-badge badge-prim">{cartCount}</span>}
-          </Link>
-
-          {/* Notifications */}
-          <div className="dropdown-wrapper">
-            <button onClick={handleNotifClick} className="action-icon-btn badge-container" aria-label="Notifications">
-              <Bell size={20} />
-              {unreadNotifs.length > 0 && <span className="icon-badge badge-warning-dot">{unreadNotifs.length}</span>}
-            </button>
-
-            {notifDropdownOpen && (
-              <div className="dropdown-menu notif-dropdown card">
-                <h4 className="dropdown-title">Notifications</h4>
-                {unreadNotifs.length === 0 ? (
-                  <p className="no-notif-text">No new notifications. ✨</p>
-                ) : (
-                  <ul className="notif-list">
-                    {unreadNotifs.map((notif) => (
-                      <li key={notif.id} className={`notif-item ${notif.type}`}>
-                        {notif.message}
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Profile Section */}
-          <div className="dropdown-wrapper">
-            {currentUser ? (
-              <button onClick={handleProfileClick} className="avatar-btn" aria-label="User profile menu">
-                <img src={currentUser.avatar} alt={currentUser.name} className="nav-avatar" />
-              </button>
-            ) : (
-              <Link to="/auth" className="btn btn-primary nav-login-btn">Login</Link>
-            )}
-
-            {currentUser && profileDropdownOpen && (
-              <div className="dropdown-menu profile-dropdown card">
-                <div className="profile-dropdown-header">
-                  <p className="profile-name">{currentUser.name}</p>
-                  <span className="profile-role badge badge-secondary">{currentUser.role}</span>
-                </div>
-                <hr className="dropdown-divider" />
-                <ul className="profile-dropdown-links">
-                  {currentUser.role === 'buyer' && (
-                    <>
-                      <li><Link to="/profile" onClick={() => setProfileDropdownOpen(false)}><User size={16} /> My Profile</Link></li>
-                      <li><Link to="/profile?tab=orders" onClick={() => setProfileDropdownOpen(false)}><ShoppingCart size={16} /> My Orders</Link></li>
-                      <li><Link to="/chat" onClick={() => setProfileDropdownOpen(false)}><MessageSquare size={16} /> Shop Chats</Link></li>
-                    </>
-                  )}
-                  {currentUser.role === 'seller' && (
-                    <>
-                      <li><Link to="/seller-dashboard" onClick={() => setProfileDropdownOpen(false)}><LayoutDashboard size={16} /> Seller Panel</Link></li>
-                      <li><Link to={currentUser.shopId ? `/shop/${currentUser.shopId}` : '/seller-dashboard'} onClick={() => setProfileDropdownOpen(false)}><ShoppingBag size={16} /> My Shop</Link></li>
-                      <li><Link to="/chat" onClick={() => setProfileDropdownOpen(false)}><MessageSquare size={16} /> Buyer Chats</Link></li>
-                    </>
-                  )}
-                  {currentUser.role === 'admin' && (
-                    <>
-                      <li><Link to="/admin" onClick={() => setProfileDropdownOpen(false)}><LayoutDashboard size={16} /> Admin Panel</Link></li>
-                      <li><Link to="/chat" onClick={() => setProfileDropdownOpen(false)}><MessageSquare size={16} /> Support Chats</Link></li>
-                    </>
-                  )}
-                </ul>
-                <hr className="dropdown-divider" />
-                <button onClick={() => { logout(); setProfileDropdownOpen(false); navigate('/'); }} className="dropdown-logout-btn">
-                  <LogOut size={16} /> Log Out
+            {/* Search Bar */}
+            <form onSubmit={handleSearchSubmit} className="nav-search-form">
+              <div className="search-input-wrapper">
+                <input 
+                  type="text" 
+                  placeholder="Search cute things..." 
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="search-input"
+                />
+                <button type="submit" className="search-btn">
+                  <Search size={18} />
                 </button>
               </div>
-            )}
+            </form>
+
+            {/* Right Nav Actions */}
+            <div className="nav-actions">
+              {/* Dark Mode Toggle */}
+              <button onClick={toggleDarkMode} className="action-icon-btn theme-toggle-btn" aria-label="Toggle Theme">
+                {theme === 'light' ? <Moon size={20} /> : <Sun size={20} />}
+              </button>
+
+              {/* Wishlist */}
+              <Link to="/profile?tab=wishlist" className="action-icon-btn badge-container" aria-label="Wishlist">
+                <Heart size={20} />
+                {wishlistCount > 0 && <span className="icon-badge badge-sec">{wishlistCount}</span>}
+              </Link>
+
+              {/* Cart */}
+              <Link to="/checkout?step=cart" className="action-icon-btn badge-container" aria-label="Cart">
+                <ShoppingBag size={20} />
+                {cartCount > 0 && <span className="icon-badge badge-prim">{cartCount}</span>}
+              </Link>
+
+              {/* Notifications */}
+              <div className="dropdown-wrapper">
+                <button onClick={handleNotifClick} className="action-icon-btn badge-container" aria-label="Notifications">
+                  <Bell size={20} />
+                  {unreadNotifs.length > 0 && <span className="icon-badge badge-warning-dot">{unreadNotifs.length}</span>}
+                </button>
+
+                {notifDropdownOpen && (
+                  <div className="dropdown-menu notif-dropdown card">
+                    <h4 className="dropdown-title">Notifications</h4>
+                    {unreadNotifs.length === 0 ? (
+                      <p className="no-notif-text">No new notifications. ✨</p>
+                    ) : (
+                      <ul className="notif-list">
+                        {unreadNotifs.map((notif) => (
+                          <li key={notif.id} className={`notif-item ${notif.type}`}>
+                            {notif.message}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Profile Section */}
+              <div className="dropdown-wrapper">
+                {currentUser ? (
+                  <button onClick={handleProfileClick} className="avatar-btn" aria-label="User profile menu">
+                    <img src={currentUser.avatar} alt={currentUser.name} className="nav-avatar" />
+                  </button>
+                ) : (
+                  <Link to="/auth" className="btn btn-primary nav-login-btn">Login</Link>
+                )}
+
+                {currentUser && profileDropdownOpen && (
+                  <div className="dropdown-menu profile-dropdown card">
+                    <div className="profile-dropdown-header">
+                      <p className="profile-name">{currentUser.name}</p>
+                      <span className="profile-role badge badge-secondary">{currentUser.role}</span>
+                    </div>
+                    <hr className="dropdown-divider" />
+                    <ul className="profile-dropdown-links">
+                      {currentUser.role === 'buyer' && (
+                        <>
+                          <li><Link to="/profile" onClick={() => setProfileDropdownOpen(false)}><User size={16} /> My Profile</Link></li>
+                          <li><Link to="/orders" onClick={() => setProfileDropdownOpen(false)}><ShoppingCart size={16} /> My Orders</Link></li>
+                          <li><Link to="/chat" onClick={() => setProfileDropdownOpen(false)}><MessageSquare size={16} /> Shop Chats</Link></li>
+                        </>
+                      )}
+                      {currentUser.role === 'seller' && (
+                        <>
+                          <li><Link to="/seller-dashboard" onClick={() => setProfileDropdownOpen(false)}><LayoutDashboard size={16} /> Seller Panel</Link></li>
+                          <li><Link to={currentUser.shopId ? `/shop/${currentUser.shopId}` : '/seller-dashboard'} onClick={() => setProfileDropdownOpen(false)}><ShoppingBag size={16} /> My Shop</Link></li>
+                          <li><Link to="/chat" onClick={() => setProfileDropdownOpen(false)}><MessageSquare size={16} /> Buyer Chats</Link></li>
+                        </>
+                      )}
+                      {currentUser.role === 'admin' && (
+                        <>
+                          <li><Link to="/admin" onClick={() => setProfileDropdownOpen(false)}><LayoutDashboard size={16} /> Admin Panel</Link></li>
+                          <li><Link to="/chat" onClick={() => setProfileDropdownOpen(false)}><MessageSquare size={16} /> Support Chats</Link></li>
+                        </>
+                      )}
+                    </ul>
+                    <hr className="dropdown-divider" />
+                    <button onClick={() => { logout(); setProfileDropdownOpen(false); navigate('/'); }} className="dropdown-logout-btn">
+                      <LogOut size={16} /> Log Out
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {/* Mobile Menu Button */}
+            <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="mobile-menu-toggle-btn" aria-label="Toggle mobile menu">
+              {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+            </button>
           </div>
         </div>
 
-        {/* Mobile Menu Button */}
-        <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)} className="mobile-menu-toggle-btn" aria-label="Toggle mobile menu">
-          {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
-      </div>
-    </nav>
+        {/* Row 2: Home | Categories | Trending | Shops | Offers / Deals | Best Sellers | My Orders */}
+        <div className="nav-row-bottom">
+          <div className="container bottom-nav-inner">
+            <ul className="nav-links">
+              <li><Link to="/">Home</Link></li>
+              <li><Link to="/categories">Categories</Link></li>
+              <li><Link to="/trending">Trending</Link></li>
+              <li><Link to="/shops">Shops</Link></li>
+              <li><Link to="/offers">Offers / Deals</Link></li>
+              <li><Link to="/best-sellers">Best Sellers</Link></li>
+              <li><Link to="/orders">My Orders</Link></li>
+            </ul>
+          </div>
+        </div>
+      </nav>
 
-    {/* Mobile Drawer */}
-    {mobileMenuOpen && (
-      <div className="mobile-drawer card">
+      {/* Mobile Drawer */}
+      {mobileMenuOpen && (
+        <div className="mobile-drawer card">
           {/* Search bar inside drawer */}
           <form onSubmit={handleSearchSubmit} className="mobile-search-form">
             <div className="search-input-wrapper">
@@ -235,39 +242,32 @@ export default function Navbar() {
 
           <ul className="mobile-drawer-links">
             <li><Link to="/" onClick={() => setMobileMenuOpen(false)}>Home</Link></li>
-            <li><Link to="/?category=T-Shirts" onClick={() => setMobileMenuOpen(false)}>T-Shirts</Link></li>
-            <li><Link to="/?category=Birthday%20Kit" onClick={() => setMobileMenuOpen(false)}>Birthday Kit</Link></li>
-            <li><Link to="/?category=Caps" onClick={() => setMobileMenuOpen(false)}>Caps</Link></li>
-            <li><Link to="/?category=Posters" onClick={() => setMobileMenuOpen(false)}>Posters</Link></li>
-            <li><Link to="/?category=Gifts" onClick={() => setMobileMenuOpen(false)}>Gifts</Link></li>
-            <li><Link to="/about" onClick={() => setMobileMenuOpen(false)}>About Us</Link></li>
+            <li><Link to="/categories" onClick={() => setMobileMenuOpen(false)}>Categories</Link></li>
+            <li><Link to="/trending" onClick={() => setMobileMenuOpen(false)}>Trending</Link></li>
+            <li><Link to="/shops" onClick={() => setMobileMenuOpen(false)}>Shops</Link></li>
+            <li><Link to="/offers" onClick={() => setMobileMenuOpen(false)}>Offers / Deals</Link></li>
+            <li><Link to="/best-sellers" onClick={() => setMobileMenuOpen(false)}>Best Sellers</Link></li>
+            <li><Link to="/orders" onClick={() => setMobileMenuOpen(false)}>My Orders</Link></li>
+            <li><Link to="/profile" onClick={() => setMobileMenuOpen(false)}>Profile</Link></li>
+            
             <hr className="dropdown-divider" />
-            {currentUser ? (
+            
+            {currentUser && currentUser.role === 'seller' && (
               <>
-                {currentUser.role === 'buyer' && (
-                  <>
-                    <li><Link to="/profile" onClick={() => setMobileMenuOpen(false)}>My Profile</Link></li>
-                    <li><Link to="/profile?tab=orders" onClick={() => setMobileMenuOpen(false)}>My Orders</Link></li>
-                    <li><Link to="/chat" onClick={() => setMobileMenuOpen(false)}>Chat with Sellers</Link></li>
-                  </>
-                )}
-                {currentUser.role === 'seller' && (
-                  <>
-                    <li><Link to="/seller-dashboard" onClick={() => setMobileMenuOpen(false)}>Seller Dashboard</Link></li>
-                    <li><Link to={currentUser.shopId ? `/shop/${currentUser.shopId}` : '/seller-dashboard'} onClick={() => setMobileMenuOpen(false)}>My Shop</Link></li>
-                    <li><Link to="/chat" onClick={() => setMobileMenuOpen(false)}>Buyer Chats</Link></li>
-                  </>
-                )}
-                {currentUser.role === 'admin' && (
-                  <>
-                    <li><Link to="/admin" onClick={() => setMobileMenuOpen(false)}>Admin Panel</Link></li>
-                    <li><Link to="/chat" onClick={() => setMobileMenuOpen(false)}>Support Chats</Link></li>
-                  </>
-                )}
-                <li onClick={() => { logout(); setMobileMenuOpen(false); navigate('/'); }} className="mobile-logout-link">
-                  Log Out
-                </li>
+                <li><Link to="/seller-dashboard" onClick={() => setMobileMenuOpen(false)}>Seller Dashboard</Link></li>
+                <li><Link to="/chat" onClick={() => setMobileMenuOpen(false)}>Buyer Chats</Link></li>
               </>
+            )}
+            {currentUser && currentUser.role === 'admin' && (
+              <>
+                <li><Link to="/admin" onClick={() => setMobileMenuOpen(false)}>Admin Panel</Link></li>
+                <li><Link to="/chat" onClick={() => setMobileMenuOpen(false)}>Support Chats</Link></li>
+              </>
+            )}
+            {currentUser ? (
+              <li onClick={() => { logout(); setMobileMenuOpen(false); navigate('/'); }} className="mobile-logout-link">
+                Log Out
+              </li>
             ) : (
               <li><Link to="/auth" className="btn btn-primary" onClick={() => setMobileMenuOpen(false)} style={{ display: 'block', textAlign: 'center' }}>Login</Link></li>
             )}
@@ -282,21 +282,61 @@ export default function Navbar() {
           top: 0;
           left: 0;
           right: 0;
-          height: 80px;
           background: var(--bg-nav);
           backdrop-filter: var(--glass-blur);
           -webkit-backdrop-filter: var(--glass-blur);
           border-bottom: 1px solid var(--border-color);
           z-index: 1000;
           display: flex;
-          align-items: center;
+          flex-direction: column;
+          align-items: stretch;
           transition: background var(--transition-normal);
         }
-        .nav-wrapper {
+        .nav-row-top {
+          width: 100%;
+          border-bottom: 1px solid var(--border-color);
+          padding: 12px 0;
+          display: flex;
+          align-items: center;
+        }
+        .nav-row-bottom {
+          width: 100%;
+          padding: 10px 0;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: rgba(255,255,255,0.4);
+        }
+        [data-theme='dark'] .nav-row-bottom {
+          background: rgba(0,0,0,0.2);
+        }
+        .top-nav-inner {
           display: flex;
           align-items: center;
           justify-content: space-between;
           width: 100%;
+        }
+        .bottom-nav-inner {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 100%;
+        }
+        .main-content {
+          padding-top: 135px !important;
+        }
+        @media (max-width: 1024px) {
+          .nav-row-top {
+            height: 80px;
+            padding: 0;
+            border-bottom: none;
+          }
+          .nav-row-bottom {
+            display: none;
+          }
+          .main-content {
+            padding-top: 80px !important;
+          }
         }
         .nav-logo {
           display: flex;

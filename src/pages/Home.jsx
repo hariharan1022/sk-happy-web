@@ -66,6 +66,20 @@ export default function Home() {
     return () => clearInterval(timer);
   }, []);
 
+  // Smooth scroll helper
+  useEffect(() => {
+    const scrollTarget = searchParams.get('scroll');
+    if (scrollTarget === 'categories') {
+      setTimeout(() => {
+        document.querySelector('.categories-section')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 400);
+    } else if (scrollTarget === 'shops') {
+      setTimeout(() => {
+        document.querySelector('.shops-section')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 400);
+    }
+  }, [searchParams]);
+
   const handleNextSlide = () => {
     setCurrentSlide((prev) => (prev + 1) % BANNER_SLIDES.length);
   };
@@ -76,7 +90,6 @@ export default function Home() {
 
   const selectCategory = (cat) => {
     if (categoryQuery === cat) {
-      // Toggle off
       searchParams.delete('category');
     } else {
       searchParams.set('category', cat);
@@ -84,12 +97,17 @@ export default function Home() {
     setSearchParams(searchParams);
   };
 
+  const selectedFilter = searchParams.get('filter') || 'all';
+
   // Filter Products
   const filteredProducts = products.filter(product => {
     if (product.hidden) return false;
     
     // Category check
     if (categoryQuery && product.category !== categoryQuery) return false;
+
+    // Offers & Deals check
+    if (selectedFilter === 'offers' && !(product.discount > 0)) return false;
     
     // Search check
     if (searchQuery) {
@@ -112,12 +130,15 @@ export default function Home() {
 
   // Sort products
   const sortedProducts = [...filteredProducts].sort((a, b) => {
+    if (selectedFilter === 'trending') return b.rating - a.rating;
+    if (selectedFilter === 'best-sellers') return b.rating * (b.stock || 1) - a.rating * (a.stock || 1);
+
     const priceA = a.price * (1 - (a.discount || 0) / 100);
     const priceB = b.price * (1 - (b.discount || 0) / 100);
 
     if (sortBy === 'low-to-high') return priceA - priceB;
     if (sortBy === 'high-to-low') return priceB - priceA;
-    return b.rating - a.rating; // Trending (best rated first)
+    return b.rating - a.rating; // Default
   });
 
   // Flash Sale products (discount > 0)

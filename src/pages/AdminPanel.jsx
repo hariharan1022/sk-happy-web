@@ -3,7 +3,8 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useMarketplace } from '../context/MarketplaceContext';
 import { 
   Users, Store, ShoppingBag, DollarSign, Check, Ban, 
-  Trash2, EyeOff, Eye, BarChart3, Receipt, ShieldAlert 
+  Trash2, EyeOff, Eye, BarChart3, Receipt, ShieldAlert,
+  LayoutDashboard, FileText, Package
 } from 'lucide-react';
 
 export default function AdminPanel() {
@@ -14,7 +15,7 @@ export default function AdminPanel() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const activeTab = searchParams.get('tab') || 'shops-approval';
+  const activeTab = searchParams.get('tab') || 'dashboard';
 
   // Guard: Admin only
   useEffect(() => {
@@ -85,23 +86,38 @@ export default function AdminPanel() {
 
           <ul className="admin-nav-list">
             <li>
-              <button onClick={() => setActiveTab('shops-approval')} className={`admin-nav-btn ${activeTab === 'shops-approval' ? 'active' : ''}`}>
-                <Store size={18} /> Shop Approvals ({pendingShops.length})
+              <button onClick={() => setActiveTab('dashboard')} className={`admin-nav-btn ${activeTab === 'dashboard' ? 'active' : ''}`}>
+                <LayoutDashboard size={18} /> Dashboard
               </button>
             </li>
             <li>
               <button onClick={() => setActiveTab('users')} className={`admin-nav-btn ${activeTab === 'users' ? 'active' : ''}`}>
-                <Users size={18} /> User Directory ({platformUsersList.length})
+                <Users size={18} /> Users ({platformUsersList.length})
               </button>
             </li>
             <li>
-              <button onClick={() => setActiveTab('moderation')} className={`admin-nav-btn ${activeTab === 'moderation' ? 'active' : ''}`}>
-                <ShoppingBag size={18} /> Product Moderation
+              <button onClick={() => setActiveTab('sellers')} className={`admin-nav-btn ${activeTab === 'sellers' ? 'active' : ''}`}>
+                <Store size={18} /> Sellers ({shops.length})
               </button>
             </li>
             <li>
-              <button onClick={() => setActiveTab('revenue')} className={`admin-nav-btn ${activeTab === 'revenue' ? 'active' : ''}`}>
-                <Receipt size={18} /> Platform Sales
+              <button onClick={() => setActiveTab('products')} className={`admin-nav-btn ${activeTab === 'products' ? 'active' : ''}`}>
+                <ShoppingBag size={18} /> Products ({products.length})
+              </button>
+            </li>
+            <li>
+              <button onClick={() => setActiveTab('orders')} className={`admin-nav-btn ${activeTab === 'orders' ? 'active' : ''}`}>
+                <Receipt size={18} /> Orders ({orders.length})
+              </button>
+            </li>
+            <li>
+              <button onClick={() => setActiveTab('reports')} className={`admin-nav-btn ${activeTab === 'reports' ? 'active' : ''}`}>
+                <ShieldAlert size={18} /> Reports
+              </button>
+            </li>
+            <li>
+              <button onClick={() => setActiveTab('analytics')} className={`admin-nav-btn ${activeTab === 'analytics' ? 'active' : ''}`}>
+                <BarChart3 size={18} /> Analytics
               </button>
             </li>
           </ul>
@@ -110,51 +126,42 @@ export default function AdminPanel() {
         {/* Display panel */}
         <div className="admin-content-pane">
           
-          {/* TAB 1: SHOP APPROVALS */}
-          {activeTab === 'shops-approval' && (
+          {/* TAB 1: DASHBOARD */}
+          {activeTab === 'dashboard' && (
             <div className="card tab-pane-card">
-              <h3>Seller Shops Approval</h3>
-              <p className="subtitle">Verify new vendor registrations before public launch</p>
+              <h3>Admin Dashboard</h3>
+              <p className="subtitle">Overview of platform transactions and registration events</p>
               <hr className="divider" style={{ margin: '15px 0' }} />
 
-              {pendingShops.length === 0 ? (
-                <div className="empty-tab-view">
-                  <span className="empty-emoji">✨🛡️</span>
-                  <h4>All Shops Approved!</h4>
-                  <p>There are no pending vendor applications at this time.</p>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' }}>
+                <div className="card bg-light">
+                  <h4>Pending Shop Approvals</h4>
+                  {pendingShops.length === 0 ? (
+                    <p className="text-muted" style={{ fontSize: '0.85rem' }}>All shops approved. ✨</p>
+                  ) : (
+                    <p style={{ fontWeight: 'bold', fontSize: '1.25rem', color: 'var(--primary)', margin: '5px 0 0' }}>
+                      {pendingShops.length} Shops Awaiting Action
+                    </p>
+                  )}
+                  <button onClick={() => setActiveTab('sellers')} className="btn btn-secondary small-btn" style={{ marginTop: '10px' }}>
+                    Verify Sellers
+                  </button>
                 </div>
-              ) : (
-                <div className="pending-shops-list">
-                  {pendingShops.map(shop => (
-                    <div key={shop.id} className="pending-shop-card card bg-light">
-                      <div className="shop-info-row">
-                        <img src={shop.logo} alt="" className="pending-logo" />
-                        <div className="shop-details">
-                          <h4>{shop.name}</h4>
-                          <span className="badge badge-secondary">{shop.category}</span>
-                          <p>{shop.description}</p>
-                          <div className="contacts">
-                            <span>📧 {shop.contact}</span>
-                            <span>📍 {shop.address}</span>
-                          </div>
-                        </div>
-                      </div>
-                      <div className="action-row">
-                        <button 
-                          onClick={() => approveShop(shop.id)} 
-                          className="btn btn-primary"
-                        >
-                          <Check size={16} /> Approve & Activate
-                        </button>
-                      </div>
-                    </div>
-                  ))}
+
+                <div className="card bg-light">
+                  <h4>Product Catalog Overview</h4>
+                  <p style={{ fontWeight: 'bold', fontSize: '1.25rem', color: 'var(--text-primary)', margin: '5px 0 0' }}>
+                    {products.length} Public Listings
+                  </p>
+                  <button onClick={() => setActiveTab('products')} className="btn btn-secondary small-btn" style={{ marginTop: '10px' }}>
+                    Moderate Listings
+                  </button>
                 </div>
-              )}
+              </div>
             </div>
           )}
 
-          {/* TAB 2: USER DIRECTORY */}
+          {/* TAB 2: USERS */}
           {activeTab === 'users' && (
             <div className="card tab-pane-card">
               <h3>User Directory</h3>
@@ -207,8 +214,79 @@ export default function AdminPanel() {
             </div>
           )}
 
-          {/* TAB 3: PRODUCT MODERATION */}
-          {activeTab === 'moderation' && (
+          {/* TAB 3: SELLERS (SHOP APPROVALS) */}
+          {activeTab === 'sellers' && (
+            <div className="card tab-pane-card">
+              <h3>Seller Shops Directory & Approvals</h3>
+              <p className="subtitle">Verify new vendor registrations or suspend active shops</p>
+              <hr className="divider" style={{ margin: '15px 0' }} />
+
+              {pendingShops.length > 0 && (
+                <div style={{ marginBottom: '20px' }}>
+                  <h4>Pending Approvals ({pendingShops.length})</h4>
+                  <div className="pending-shops-list">
+                    {pendingShops.map(shop => (
+                      <div key={shop.id} className="pending-shop-card card bg-light" style={{ padding: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <div className="shop-info-row">
+                          <img src={shop.logo} alt="" className="pending-logo" />
+                          <div className="shop-details">
+                            <h4>{shop.name}</h4>
+                            <span className="badge badge-secondary">{shop.category}</span>
+                            <p>{shop.description}</p>
+                            <div className="contacts">
+                              <span>📧 {shop.contact}</span>
+                              <span>📍 {shop.address}</span>
+                            </div>
+                          </div>
+                        </div>
+                        <div className="action-row">
+                          <button onClick={() => approveShop(shop.id)} className="btn btn-primary">
+                            <Check size={16} /> Approve & Activate
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <h4>All Registered Shops ({shops.length})</h4>
+              <div className="table-wrapper">
+                <table className="dash-table">
+                  <thead>
+                    <tr>
+                      <th>Shop</th>
+                      <th>Owner / Contact</th>
+                      <th>Category</th>
+                      <th>Status</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {shops.map(shop => (
+                      <tr key={shop.id}>
+                        <td>
+                          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                            <img src={shop.logo} alt="" style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover' }} />
+                            <strong>{shop.name}</strong>
+                          </div>
+                        </td>
+                        <td>{shop.contact}</td>
+                        <td><span className="badge badge-secondary">{shop.category}</span></td>
+                        <td>
+                          <span className={`badge badge-${shop.status === 'approved' ? 'success' : 'secondary'}`}>
+                            {shop.status}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 4: PRODUCTS */}
+          {activeTab === 'products' && (
             <div className="card tab-pane-card">
               <h3>Product Moderation</h3>
               <p className="subtitle">Review platform catalog items. Hide or delete listings</p>
@@ -269,10 +347,10 @@ export default function AdminPanel() {
             </div>
           )}
 
-          {/* TAB 4: REVENUE PLATFORM TRANSACTIONS */}
-          {activeTab === 'revenue' && (
+          {/* TAB 5: ORDERS */}
+          {activeTab === 'orders' && (
             <div className="card tab-pane-card">
-              <h3>Platform Sales & Revenue</h3>
+              <h3>Platform Sales & Orders</h3>
               <p className="subtitle">Review checkout orders and coupon code utilization</p>
               <hr className="divider" style={{ margin: '15px 0' }} />
 
@@ -316,6 +394,44 @@ export default function AdminPanel() {
                   </table>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* TAB 6: REPORTS */}
+          {activeTab === 'reports' && (
+            <div className="card tab-pane-card">
+              <h3>Security & Abuse Reports</h3>
+              <p className="subtitle">Moderator logs regarding flagged items or user complaints</p>
+              <hr className="divider" style={{ margin: '15px 0' }} />
+
+              <div className="empty-tab-view">
+                <span className="empty-emoji">🛡️✨</span>
+                <h4>No Abuse Reports!</h4>
+                <p>No listings or buyers have been flagged for review today.</p>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 7: ANALYTICS */}
+          {activeTab === 'analytics' && (
+            <div className="card tab-pane-card">
+              <h3>Advanced Platform Analytics</h3>
+              <p className="subtitle">Track volume scaling, new shop joins, and commission margins</p>
+              <hr className="divider" style={{ margin: '15px 0' }} />
+
+              <div style={{ display: 'grid', gridTemplateColumns: '2fr 1fr', gap: '20px' }}>
+                <div className="card bg-light">
+                  <h4>Platform Commission Earnings (10%)</h4>
+                  <h3 className="text-green" style={{ margin: '10px 0 0' }}>
+                    ${(orders.reduce((sum, ord) => sum + ord.total, 0) * 0.10).toFixed(2)} USD
+                  </h3>
+                  <p className="subtitle" style={{ fontSize: '0.8rem', marginTop: '4px' }}>Net platform fees captured</p>
+                </div>
+                <div className="card bg-light" style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', textAlign: 'center' }}>
+                  <strong>{shops.filter(s => s.status === 'approved').length}</strong>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Active Shops</span>
+                </div>
+              </div>
             </div>
           )}
 

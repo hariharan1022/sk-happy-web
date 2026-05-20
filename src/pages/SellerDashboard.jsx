@@ -4,7 +4,7 @@ import { useMarketplace } from '../context/MarketplaceContext';
 import { 
   LayoutDashboard, ShoppingBag, ShoppingCart, Settings, Plus, 
   TrendingUp, Users, DollarSign, Edit, Trash2, EyeOff, Eye, 
-  CheckCircle, Truck, Package 
+  CheckCircle, Truck, Package, Store, MessageSquare, Star
 } from 'lucide-react';
 
 export default function SellerDashboard() {
@@ -15,7 +15,7 @@ export default function SellerDashboard() {
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  const activeTab = searchParams.get('tab') || 'analytics';
+  const activeTab = searchParams.get('tab') || 'dashboard';
 
   // State for Add/Edit Product Modal
   const [showProductModal, setShowProductModal] = useState(false);
@@ -379,23 +379,48 @@ export default function SellerDashboard() {
 
           <ul className="dashboard-nav-list">
             <li>
-              <button onClick={() => setActiveTab('analytics')} className={`dash-nav-btn ${activeTab === 'analytics' ? 'active' : ''}`}>
-                <LayoutDashboard size={18} /> Analytics & Reports
+              <button onClick={() => setActiveTab('dashboard')} className={`dash-nav-btn ${activeTab === 'dashboard' ? 'active' : ''}`}>
+                <LayoutDashboard size={18} /> Dashboard
               </button>
             </li>
             <li>
-              <button onClick={() => setActiveTab('products')} className={`dash-nav-btn ${activeTab === 'products' ? 'active' : ''}`}>
-                <ShoppingBag size={18} /> Product Catalog ({sellerProducts.length})
+              <button onClick={() => { openAddProductModal(); setActiveTab('add-product'); }} className={`dash-nav-btn ${activeTab === 'add-product' ? 'active' : ''}`}>
+                <Plus size={18} /> Add Product
+              </button>
+            </li>
+            <li>
+              <button onClick={() => setActiveTab('manage-products')} className={`dash-nav-btn ${activeTab === 'manage-products' ? 'active' : ''}`}>
+                <ShoppingBag size={18} /> Manage Products ({sellerProducts.length})
+              </button>
+            </li>
+            <li>
+              <button onClick={() => setActiveTab('my-shop')} className={`dash-nav-btn ${activeTab === 'my-shop' ? 'active' : ''}`}>
+                <Store size={18} /> My Shop
               </button>
             </li>
             <li>
               <button onClick={() => setActiveTab('orders')} className={`dash-nav-btn ${activeTab === 'orders' ? 'active' : ''}`}>
-                <ShoppingCart size={18} /> Order Manager ({sellerOrders.length})
+                <ShoppingCart size={18} /> Orders ({sellerOrders.length})
               </button>
             </li>
             <li>
-              <button onClick={() => setActiveTab('shop-settings')} className={`dash-nav-btn ${activeTab === 'shop-settings' ? 'active' : ''}`}>
-                <Settings size={18} /> Shop Settings
+              <button onClick={() => setActiveTab('revenue')} className={`dash-nav-btn ${activeTab === 'revenue' ? 'active' : ''}`}>
+                <DollarSign size={18} /> Revenue
+              </button>
+            </li>
+            <li>
+              <button onClick={() => setActiveTab('customer-chat')} className={`dash-nav-btn ${activeTab === 'customer-chat' ? 'active' : ''}`}>
+                <MessageSquare size={18} /> Customer Chat
+              </button>
+            </li>
+            <li>
+              <button onClick={() => setActiveTab('reviews')} className={`dash-nav-btn ${activeTab === 'reviews' ? 'active' : ''}`}>
+                <Star size={18} /> Reviews
+              </button>
+            </li>
+            <li>
+              <button onClick={() => setActiveTab('settings')} className={`dash-nav-btn ${activeTab === 'settings' ? 'active' : ''}`}>
+                <Settings size={18} /> Settings
               </button>
             </li>
           </ul>
@@ -404,8 +429,8 @@ export default function SellerDashboard() {
         {/* Workspace Display Area */}
         <div className="dashboard-content-pane">
           
-          {/* TAB 1: ANALYTICS */}
-          {activeTab === 'analytics' && (
+          {/* TAB 1: DASHBOARD */}
+          {activeTab === 'dashboard' && (
             <div className="tab-pane-view">
               
               {/* Analytics widgets cards */}
@@ -439,22 +464,18 @@ export default function SellerDashboard() {
               </div>
 
               {/* Analytics Chart Block */}
-              <div className="card chart-card">
+              <div className="card chart-card" style={{ marginBottom: '20px' }}>
                 <h3>Monthly Revenue & Orders Chart</h3>
                 <p className="subtitle">Visual performance stats</p>
                 <hr className="divider" style={{ margin: '15px 0' }} />
                 
-                {/* Custom Interactive SVG Line Chart */}
                 <div className="svg-chart-container">
                   <svg viewBox="0 0 500 200" className="revenue-line-chart">
-                    {/* Grid Lines */}
                     <line x1="40" y1="20" x2="480" y2="20" stroke="var(--border-color)" strokeDasharray="4 4" />
                     <line x1="40" y1="70" x2="480" y2="70" stroke="var(--border-color)" strokeDasharray="4 4" />
                     <line x1="40" y1="120" x2="480" y2="120" stroke="var(--border-color)" strokeDasharray="4 4" />
                     <line x1="40" y1="170" x2="480" y2="170" stroke="#888" />
 
-                    {/* Chart coordinates points line */}
-                    {/* Points: Jan (120), Feb (140), Mar (70), Apr (90), May (40) */}
                     <path 
                       d="M 50 150 L 150 140 L 250 110 L 350 80 L 450 40" 
                       fill="none" 
@@ -463,21 +484,18 @@ export default function SellerDashboard() {
                       strokeLinecap="round"
                     />
 
-                    {/* Gradient under line */}
                     <path 
                       d="M 50 150 L 150 140 L 250 110 L 350 80 L 450 40 L 450 170 L 50 170 Z" 
                       fill="url(#chart-grad)"
                       opacity="0.15"
                     />
 
-                    {/* Points markers */}
                     <circle cx="50" cy="150" r="6" fill="var(--primary)" />
                     <circle cx="150" cy="140" r="6" fill="var(--primary)" />
                     <circle cx="250" cy="110" r="6" fill="var(--primary)" />
                     <circle cx="350" cy="80" r="6" fill="var(--primary)" />
                     <circle cx="450" cy="40" r="6" fill="var(--primary)" />
 
-                    {/* Labels */}
                     <text x="50" y="190" fill="var(--text-secondary)" fontSize="10" textAnchor="middle">Jan</text>
                     <text x="150" y="190" fill="var(--text-secondary)" fontSize="10" textAnchor="middle">Feb</text>
                     <text x="250" y="190" fill="var(--text-secondary)" fontSize="10" textAnchor="middle">Mar</text>
@@ -489,7 +507,6 @@ export default function SellerDashboard() {
                     <text x="30" y="70" fill="var(--text-secondary)" fontSize="9" textAnchor="end">$500</text>
                     <text x="30" y="30" fill="var(--text-secondary)" fontSize="9" textAnchor="end">$800</text>
 
-                    {/* Chart Gradient Def */}
                     <defs>
                       <linearGradient id="chart-grad" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="0%" stopColor="var(--primary)" />
@@ -499,18 +516,179 @@ export default function SellerDashboard() {
                   </svg>
                 </div>
               </div>
+
+              {/* Recent Orders List */}
+              <div className="card recent-orders-card">
+                <h3>Recent Orders Activity</h3>
+                <p className="subtitle">Latest buyer requests</p>
+                <hr className="divider" style={{ margin: '15px 0' }} />
+                {sellerOrders.length === 0 ? (
+                  <p className="text-muted">No recent sales transactions recorded.</p>
+                ) : (
+                  <div className="table-wrapper">
+                    <table className="dash-table">
+                      <thead>
+                        <tr>
+                          <th>Order ID</th>
+                          <th>Buyer</th>
+                          <th>Status</th>
+                          <th>Revenue</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        {sellerOrders.slice(0, 3).map(order => {
+                          const myItems = order.items.filter(item => item.sellerId === currentUser.id);
+                          const mySum = myItems.reduce((s, it) => s + (it.finalPrice * it.quantity), 0);
+                          return (
+                            <tr key={order.id}>
+                              <td><strong>#{order.id}</strong></td>
+                              <td>{order.buyerName}</td>
+                              <td><span className={`badge badge-${order.status === 'delivered' ? 'success' : 'secondary'}`}>{order.status}</span></td>
+                              <td><strong>${mySum.toFixed(2)}</strong></td>
+                            </tr>
+                          );
+                        })}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 
-          {/* TAB 2: PRODUCT CATALOG */}
-          {activeTab === 'products' && (
+          {/* TAB 2: ADD PRODUCT */}
+          {activeTab === 'add-product' && (
+            <div className="card tab-pane-card">
+              <h3>Add New Product Listing</h3>
+              <p className="subtitle">List a cute new item in your store catalog</p>
+              <hr className="divider" style={{ margin: '15px 0' }} />
+
+              <form onSubmit={handleProductSubmit} className="modal-product-form">
+                <div className="grid-scroll-box" style={{ maxHeight: 'none', overflowY: 'visible' }}>
+                  <div className="form-group">
+                    <label className="form-label">Product Name</label>
+                    <input 
+                      type="text" 
+                      value={prodName} 
+                      onChange={(e) => setProdName(e.target.value)}
+                      className="form-control"
+                      placeholder="e.g. Dreamy Cloud Cushion"
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Product Description</label>
+                    <textarea 
+                      value={prodDesc} 
+                      onChange={(e) => setProdDesc(e.target.value)}
+                      className="form-control"
+                      rows={3}
+                      placeholder="Give it an adorable description..."
+                      required
+                    />
+                  </div>
+
+                  <div className="grid-cols-3">
+                    <div className="form-group">
+                      <label className="form-label">Base Price ($)</label>
+                      <input 
+                        type="number" 
+                        step="0.01"
+                        value={prodPrice} 
+                        onChange={(e) => setProdPrice(e.target.value)}
+                        className="form-control"
+                        required
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Discount (%)</label>
+                      <input 
+                        type="number" 
+                        value={prodDiscount} 
+                        onChange={(e) => setProdDiscount(e.target.value)}
+                        className="form-control"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Stock Qty</label>
+                      <input 
+                        type="number" 
+                        value={prodStock} 
+                        onChange={(e) => setProdStock(e.target.value)}
+                        className="form-control"
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="grid-cols-2">
+                    <div className="form-group">
+                      <label className="form-label">Primary Category</label>
+                      <select 
+                        value={prodCategory} 
+                        onChange={(e) => setProdCategory(e.target.value)}
+                        className="form-control"
+                      >
+                        <option value="T-Shirts">T-Shirts</option>
+                        <option value="Birthday Kit">Birthday Kit</option>
+                        <option value="Caps">Caps</option>
+                        <option value="Posters">Posters</option>
+                        <option value="Gifts">Gifts</option>
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Subcategory</label>
+                      <input 
+                        type="text" 
+                        placeholder="e.g. Cushions" 
+                        value={prodSubcat} 
+                        onChange={(e) => setProdSubcat(e.target.value)}
+                        className="form-control"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Cover Image URL</label>
+                    <input 
+                      type="text" 
+                      placeholder="https://images.unsplash.com/..." 
+                      value={prodImages} 
+                      onChange={(e) => setProdImages(e.target.value)}
+                      className="form-control"
+                      required
+                    />
+                  </div>
+
+                  <div className="form-group">
+                    <label className="form-label">Tags (comma separated)</label>
+                    <input 
+                      type="text" 
+                      placeholder="aesthetic, cute, pastel" 
+                      value={prodTags} 
+                      onChange={(e) => setProdTags(e.target.value)}
+                      className="form-control"
+                    />
+                  </div>
+                </div>
+
+                <div style={{ marginTop: '20px' }}>
+                  <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>Create Listing</button>
+                </div>
+              </form>
+            </div>
+          )}
+
+          {/* TAB 3: MANAGE PRODUCTS */}
+          {activeTab === 'manage-products' && (
             <div className="card tab-pane-card">
               <div className="pane-header">
                 <div>
-                  <h3>Product Catalog</h3>
-                  <p className="subtitle">Add, edit, adjust stock, and manage item visibility</p>
+                  <h3>Manage Products</h3>
+                  <p className="subtitle">Adjust pricing, stock volume, and catalog status</p>
                 </div>
-                <button onClick={openAddProductModal} className="btn btn-primary">
+                <button onClick={() => { openAddProductModal(); setActiveTab('add-product'); }} className="btn btn-primary">
                   <Plus size={16} /> Add Product
                 </button>
               </div>
@@ -578,7 +756,37 @@ export default function SellerDashboard() {
             </div>
           )}
 
-          {/* TAB 3: ORDER MANAGER */}
+          {/* TAB 4: MY SHOP */}
+          {activeTab === 'my-shop' && (
+            <div className="card tab-pane-card">
+              <h3>My Shop Branding</h3>
+              <p className="subtitle">View public layout and storefront representation</p>
+              <hr className="divider" style={{ margin: '15px 0' }} />
+
+              <div className="shop-preview-card bg-light card" style={{ padding: '20px', marginBottom: '20px' }}>
+                <img src={sellerShop.banner} alt="" style={{ width: '100%', height: '120px', objectFit: 'cover', borderRadius: '8px', marginBottom: '15px' }} />
+                <div style={{ display: 'flex', gap: '15px', alignItems: 'center' }}>
+                  <img src={sellerShop.logo} alt="" style={{ width: '60px', height: '60px', borderRadius: '50%', objectFit: 'cover', border: '2px solid white' }} />
+                  <div>
+                    <h4>{sellerShop.name}</h4>
+                    <span className="badge badge-primary">{sellerShop.category}</span>
+                    <p style={{ fontSize: '0.85rem', margin: '4px 0 0', color: 'var(--text-secondary)' }}>{sellerShop.description}</p>
+                  </div>
+                </div>
+              </div>
+
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <button onClick={() => navigate(`/shop/${sellerShop.id}`)} className="btn btn-primary">
+                  🌐 Visit Live Storefront
+                </button>
+                <button onClick={() => setActiveTab('settings')} className="btn btn-outline">
+                  ✏️ Edit Details
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 5: ORDERS */}
           {activeTab === 'orders' && (
             <div className="card tab-pane-card">
               <h3>Order Manager</h3>
@@ -594,7 +802,6 @@ export default function SellerDashboard() {
               ) : (
                 <div className="seller-orders-list">
                   {sellerOrders.map(order => {
-                    // Extract only items belonging to this seller
                     const myItems = order.items.filter(item => item.sellerId === currentUser.id);
                     const mySum = myItems.reduce((s, it) => s + (it.finalPrice * it.quantity), 0);
 
@@ -647,10 +854,118 @@ export default function SellerDashboard() {
             </div>
           )}
 
-          {/* TAB 4: SHOP SETTINGS */}
-          {activeTab === 'shop-settings' && (
+          {/* TAB 6: REVENUE */}
+          {activeTab === 'revenue' && (
             <div className="card tab-pane-card">
-              <h3>Shop Profile Settings</h3>
+              <h3>Earnings & Payouts</h3>
+              <p className="subtitle">Track transactions, pending clearance, and request transfers</p>
+              <hr className="divider" style={{ margin: '15px 0' }} />
+
+              <div className="analytics-widgets-grid">
+                <div className="card widget-card bg-light">
+                  <span className="widget-label">Available Balance</span>
+                  <h2 className="text-green" style={{ margin: '5px 0 0' }}>${(totalRevenue * 0.9).toFixed(2)}</h2>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>After 10% platform fee</span>
+                </div>
+                <div className="card widget-card bg-light">
+                  <span className="widget-label">Pending Settlements</span>
+                  <h2 style={{ margin: '5px 0 0', color: 'var(--text-secondary)' }}>$0.00</h2>
+                  <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)' }}>Cleared after delivery confirmation</span>
+                </div>
+              </div>
+
+              <div className="card" style={{ marginTop: '20px', background: 'var(--bg-app)' }}>
+                <h4>Request Balance Cashout</h4>
+                <p className="subtitle">Transfer earnings straight to bank details</p>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginTop: '15px' }}>
+                  <div className="form-group">
+                    <label className="form-label">Transfer Method</label>
+                    <select className="form-control">
+                      <option>PayPal Account</option>
+                      <option>Direct Bank Account Link</option>
+                      <option>Stripe Payout Connect</option>
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label className="form-label">Transfer Sum ($)</label>
+                    <input type="number" defaultValue={(totalRevenue * 0.9).toFixed(2)} className="form-control" />
+                  </div>
+                </div>
+                <button onClick={() => alert('Payout transfer of $' + (totalRevenue*0.9).toFixed(2) + ' initiated successfully! 🌸')} className="btn btn-primary" style={{ marginTop: '10px' }}>
+                  💸 Initiate Transfer
+                </button>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 7: CUSTOMER CHAT */}
+          {activeTab === 'customer-chat' && (
+            <div className="card tab-pane-card">
+              <h3>Customer Chat Center</h3>
+              <p className="subtitle">Interact with buyers, answer custom questions, and send cute tips</p>
+              <hr className="divider" style={{ margin: '15px 0' }} />
+
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '20px', height: '350px' }}>
+                <div className="chat-buyers-list bg-light" style={{ borderRadius: '8px', padding: '10px', overflowY: 'auto' }}>
+                  <div style={{ padding: '10px', background: 'var(--primary-light)', borderRadius: '6px', cursor: 'pointer', marginBottom: '8px' }}>
+                    <strong>Sweet buyer 🎀</strong>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Is the cushion super squishy?</div>
+                  </div>
+                  <div style={{ padding: '10px', borderRadius: '6px', cursor: 'pointer' }}>
+                    <strong>Kawaii Lover ✨</strong>
+                    <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Love my package!</div>
+                  </div>
+                </div>
+
+                <div className="chat-window card" style={{ display: 'flex', flexDirection: 'column', height: '100%', padding: '15px', margin: 0 }}>
+                  <div style={{ flex: 1, overflowY: 'auto', display: 'flex', flexDirection: 'column', gap: '10px', paddingBottom: '10px' }}>
+                    <div style={{ alignSelf: 'flex-start', background: 'var(--border-color)', padding: '8px 12px', borderRadius: '12px 12px 12px 0', fontSize: '0.85rem' }}>
+                      Hello! Is the cushion super squishy? I want to buy 2 units.
+                    </div>
+                    <div style={{ alignSelf: 'flex-end', background: 'var(--primary)', color: 'white', padding: '8px 12px', borderRadius: '12px 12px 0 12px', fontSize: '0.85rem' }}>
+                      Yes, it is! Made with premium memory foam and soft velvet plush cover! 🌸
+                    </div>
+                  </div>
+                  <hr className="divider" style={{ margin: '10px 0' }} />
+                  <div style={{ display: 'flex', gap: '10px' }}>
+                    <input type="text" placeholder="Type cute reply..." className="form-control" style={{ flex: 1 }} />
+                    <button className="btn btn-primary" onClick={() => alert('Message Sent!')}>Send</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 8: REVIEWS */}
+          {activeTab === 'reviews' && (
+            <div className="card tab-pane-card">
+              <h3>Shop & Product Reviews</h3>
+              <p className="subtitle">See feedback left by buyers on your items</p>
+              <hr className="divider" style={{ margin: '15px 0' }} />
+
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+                <div className="review-item-card card bg-light" style={{ padding: '15px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                    <strong>Sweet buyer 🎀</strong>
+                    <span>⭐⭐⭐⭐⭐</span>
+                  </div>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>The items are incredibly cute! Very fast dispatch and super cute wrapping paper details. Highly recommend this seller!</p>
+                </div>
+                <div className="review-item-card card bg-light" style={{ padding: '15px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '8px' }}>
+                    <strong>Plushie Fanatic 🧸</strong>
+                    <span>⭐⭐⭐⭐⭐</span>
+                  </div>
+                  <p style={{ fontSize: '0.85rem', color: 'var(--text-secondary)' }}>High quality plush fabric, the pastel color represents exactly the picture details! 🌸</p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* TAB 9: SETTINGS */}
+          {activeTab === 'settings' && (
+            <div className="card tab-pane-card">
+              <h3>Shop Settings & Configuration</h3>
               <p className="subtitle">Customize branding, address points, and cover media</p>
               <hr className="divider" style={{ margin: '15px 0' }} />
 
@@ -759,7 +1074,7 @@ export default function SellerDashboard() {
                   </div>
                 </div>
 
-                <button type="submit" className="btn btn-primary">Update Shop Profile</button>
+                <button type="submit" className="btn btn-primary" style={{ marginTop: '15px' }}>Update Shop Profile</button>
               </form>
             </div>
           )}

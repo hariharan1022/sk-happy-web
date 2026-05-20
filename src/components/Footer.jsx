@@ -41,23 +41,21 @@ export default function Footer() {
 
         {/* Links Column */}
         <div className="footer-col">
-          <h4 className="footer-title">Explore</h4>
+          <h4 className="footer-title">About & Help</h4>
           <ul className="footer-links-list">
-            <li><Link to="/">Home Page</Link></li>
-            <li><Link to="/?category=Plushies%20%26%20Toys">Plushies & Toys</Link></li>
-            <li><Link to="/?category=Stationery">Stationery Supplies</Link></li>
-            <li><Link to="/?category=Home%20%26%20Kitchen">Aesthetic Decor</Link></li>
+            <li><Link to="/about">About Us</Link></li>
+            <li><Link to="/about#contact">Contact Us</Link></li>
+            <li><Link to="/about#faq">FAQ Help</Link></li>
           </ul>
         </div>
 
-        {/* Seller / Admin Column */}
+        {/* Policies Column */}
         <div className="footer-col">
-          <h4 className="footer-title">Seller Hub</h4>
+          <h4 className="footer-title">Policies & Media</h4>
           <ul className="footer-links-list">
-            <li><Link to="/auth?mode=signup&role=seller">Open a Seller Shop</Link></li>
-            <li><Link to="/auth?role=seller">Seller Login</Link></li>
-            <li><Link to="/seller-dashboard">Seller Dashboard</Link></li>
-            <li><Link to="/admin">Admin Administration</Link></li>
+            <li><a href="#privacy" onClick={(e) => { e.preventDefault(); showToast('🌸 Privacy Policy is set to standard adorable marketplace guidelines.', 'success'); }}>Privacy Policy</a></li>
+            <li><a href="#terms" onClick={(e) => { e.preventDefault(); showToast('🌸 Terms of Service are activated under cute shopping protections.', 'success'); }}>Terms</a></li>
+            <li><a href="https://instagram.com" target="_blank" rel="noreferrer">Social Media</a></li>
           </ul>
         </div>
 
