@@ -410,7 +410,35 @@ export const MarketplaceProvider = ({ children }) => {
       try {
         const { data: dbProducts, error: prodErr } = await supabase.from('products').select('*');
         if (!prodErr && dbProducts && dbProducts.length > 0) {
-          setProducts(dbProducts);
+          const parsedProducts = dbProducts.map(p => {
+            try {
+              const parsed = JSON.parse(p.description);
+              if (parsed && typeof parsed === 'object' && ('fullDesc' in parsed || 'variants' in parsed)) {
+                return {
+                  ...p,
+                  description: parsed.fullDesc || '',
+                  shortDescription: parsed.shortDesc || '',
+                  shortDesc: parsed.shortDesc || '',
+                  video: parsed.video || '',
+                  currency: parsed.currency || '$',
+                  sku: parsed.sku || '',
+                  status: parsed.status || 'In stock',
+                  weight: parsed.weight || '',
+                  dimensions: parsed.dimensions || '',
+                  shippingCost: parsed.shippingCost || 0,
+                  shippingCountries: parsed.shippingCountries || '',
+                  metaTitle: parsed.metaTitle || '',
+                  metaDescription: parsed.metaDescription || '',
+                  slug: parsed.slug || '',
+                  variants: parsed.variants || []
+                };
+              }
+            } catch (e) {
+              // Legacy standard string description
+            }
+            return p;
+          });
+          setProducts(parsedProducts);
         }
       } catch (err) {
         console.warn('Supabase product query error:', err);
@@ -739,7 +767,11 @@ export const MarketplaceProvider = ({ children }) => {
   };
 
   const logout = async () => {
-    await supabase.auth.signOut();
+    try {
+      await supabase.auth.signOut();
+    } catch (e) {
+      console.warn('Supabase signout exception:', e);
+    }
     setCurrentUser(null);
     setCart([]);
     showToast('Logged out successfully. See you soon!', 'info');
@@ -930,19 +962,35 @@ export const MarketplaceProvider = ({ children }) => {
   };
 
   // Shop Follow System
-  const followShop = (shopId) => {
+  const followShop = async (shopId) => {
     if (!currentUser) {
       showToast('Please login to follow shops!', 'warning');
       return;
     }
+    
+    const exists = followedShops.includes(shopId);
+    let newFollowers = 0;
+    
+    setShops(prevShops => prevShops.map(s => {
+      if (s.id === shopId) {
+        newFollowers = exists ? Math.max(0, Number(s.followers) - 1) : Number(s.followers) + 1;
+        return { ...s, followers: newFollowers };
+      }
+      return s;
+    }));
+
+    try {
+      const { error } = await supabase.from('shops').update({ followers: newFollowers }).eq('id', shopId);
+      if (error) console.warn('Supabase followers update error:', error.message);
+    } catch (err) {
+      console.warn('Supabase followers exception:', err);
+    }
+
     setFollowedShops((prev) => {
-      const exists = prev.includes(shopId);
       if (exists) {
-        setShops(prevShops => prevShops.map(s => s.id === shopId ? { ...s, followers: Math.max(0, s.followers - 1) } : s));
         showToast('Unfollowed shop.', 'info');
         return prev.filter(id => id !== shopId);
       } else {
-        setShops(prevShops => prevShops.map(s => s.id === shopId ? { ...s, followers: s.followers + 1 } : s));
         showToast('Thank you for following!', 'success');
         return [...prev, shopId];
       }
@@ -1142,6 +1190,48 @@ export const MarketplaceProvider = ({ children }) => {
     showToast('Shop details updated successfully!', 'success');
   };
 
+  // Helper to sanitize product metadata for Supabase standard schema
+  const sanitizeProductForSupabase = (prod) => {
+    const descriptionPayload = JSON.stringify({
+      fullDesc: prod.description || '',
+      shortDesc: prod.shortDescription || prod.shortDesc || '',
+      video: prod.video || '',
+      currency: prod.currency || '$',
+      sku: prod.sku || '',
+      status: prod.status || 'In stock',
+      weight: prod.weight || '',
+      dimensions: prod.dimensions || '',
+      shippingCost: Number(prod.shippingCost) || 0,
+      shippingCountries: prod.shippingCountries || '',
+      metaTitle: prod.metaTitle || '',
+      metaDescription: prod.metaDescription || '',
+      slug: prod.slug || '',
+      variants: prod.variants || []
+    });
+
+    return {
+      id: prod.id,
+      name: prod.name,
+      description: descriptionPayload,
+      price: Number(prod.price) || 0,
+      discount: Number(prod.discount) || 0,
+      stock: Number(prod.stock) || 0,
+      category: prod.category || '',
+      subcategory: prod.subcategory || '',
+      images: prod.images || [],
+      sizes: prod.sizes || [],
+      colors: prod.colors || [],
+      tags: prod.tags || [],
+      deliveryDetails: prod.deliveryDetails || '',
+      returnPolicy: prod.returnPolicy || '',
+      shopId: prod.shopId,
+      sellerId: prod.sellerId,
+      rating: Number(prod.rating) || 5.0,
+      reviews: prod.reviews || [],
+      hidden: prod.hidden || false
+    };
+  };
+
   // Seller Product Operations
   const addProduct = async (prodData) => {
     const newProd = {
@@ -1153,7 +1243,8 @@ export const MarketplaceProvider = ({ children }) => {
     };
 
     try {
-      const { error } = await supabase.from('products').insert([newProd]);
+      const dbPayload = sanitizeProductForSupabase(newProd);
+      const { error } = await supabase.from('products').insert([dbPayload]);
       if (error) {
         console.warn('Supabase products table insert error:', error.message);
       } else {
@@ -1169,7 +1260,8 @@ export const MarketplaceProvider = ({ children }) => {
 
   const updateProduct = async (productId, prodData) => {
     try {
-      const { error } = await supabase.from('products').update(prodData).eq('id', productId);
+      const dbPayload = sanitizeProductForSupabase({ id: productId, ...prodData });
+      const { error } = await supabase.from('products').update(dbPayload).eq('id', productId);
       if (error) {
         console.warn('Supabase product update error:', error.message);
       } else {
