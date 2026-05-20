@@ -42,8 +42,9 @@ export default function Navbar() {
   };
 
   return (
-    <nav className="navbar">
-      <div className="container nav-wrapper">
+    <>
+      <nav className="navbar">
+        <div className="container nav-wrapper">
         {/* Logo */}
         <Link to="/" className="nav-logo" onClick={() => setMobileMenuOpen(false)}>
           <span className="logo-sparkle">✨</span>
@@ -174,10 +175,11 @@ export default function Navbar() {
           {mobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </div>
+    </nav>
 
-      {/* Mobile Drawer */}
-      {mobileMenuOpen && (
-        <div className="mobile-drawer card">
+    {/* Mobile Drawer */}
+    {mobileMenuOpen && (
+      <div className="mobile-drawer card">
           {/* Search bar inside drawer */}
           <form onSubmit={handleSearchSubmit} className="mobile-search-form">
             <div className="search-input-wrapper">
@@ -676,6 +678,6 @@ export default function Navbar() {
           }
         }
       `}} />
-    </nav>
+    </>
   );
 }
