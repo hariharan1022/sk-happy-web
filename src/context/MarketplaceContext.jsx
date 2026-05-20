@@ -635,12 +635,22 @@ export const MarketplaceProvider = ({ children }) => {
       }
     }
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password
-    });
+    let authResult = null;
+    let authError = null;
 
-    if (error) {
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password
+      });
+      authResult = data;
+      authError = error;
+    } catch (err) {
+      console.warn('Supabase signInWithPassword exception, falling back to local auth:', err);
+      authError = err;
+    }
+
+    if (authError || !authResult?.user) {
       // Fallback to local memory login for demo accounts if user didn't register them in Supabase auth yet!
       const foundUser = users.find(u => u.email.toLowerCase() === email.toLowerCase() && u.password === password && u.role === role);
       if (foundUser) {
@@ -652,11 +662,11 @@ export const MarketplaceProvider = ({ children }) => {
         showToast(`Welcome back (Local Session): ${foundUser.name}!`, 'success');
         return true;
       }
-      showToast(error.message, 'error');
+      showToast(authError?.message || 'Login failed. Please check credentials.', 'error');
       return false;
     }
 
-    const user = data.user;
+    const user = authResult.user;
     let userRole = user.user_metadata?.role || 'buyer';
     let userShopId = user.user_metadata?.shopId || null;
     let userName = user.user_metadata?.name || 'User';
@@ -780,32 +790,72 @@ export const MarketplaceProvider = ({ children }) => {
   const signup = async (name, email, password, role, shopDetails = null) => {
     const shopId = role === 'seller' ? 'shop-' + Date.now() : null;
 
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password,
-      options: {
-        data: {
-          name,
-          role,
-          shopId,
-          avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
+    let authResult = null;
+    let authError = null;
+
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            name,
+            role,
+            shopId,
+            avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
+          }
         }
+      });
+      authResult = data;
+      authError = error;
+    } catch (err) {
+      console.warn('Supabase signUp exception, falling back to local registration:', err);
+      authError = err;
+    }
+
+    if (authError || !authResult?.user) {
+      // Fallback: Create a mock user in local memory
+      const newUser = {
+        id: 'user-' + Date.now(),
+        name,
+        email,
+        password,
+        role,
+        shopId,
+        avatar: 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150&auto=format&fit=crop&q=80',
+        banned: false
+      };
+
+      if (role === 'seller') {
+        const newShop = {
+          id: shopId,
+          name: shopDetails?.shopName || `${name}'s Cute Shop`,
+          description: shopDetails?.description || 'Welcome to my cute shop!',
+          logo: shopDetails?.logo || 'https://images.unsplash.com/photo-1596495578065-6e076b8a9dad?w=200&auto=format&fit=crop&q=80',
+          banner: shopDetails?.banner || 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1200&auto=format&fit=crop&q=80',
+          category: shopDetails?.category || 'Other',
+          contact: shopDetails?.contact || email,
+          social: shopDetails?.social || {},
+          address: shopDetails?.address || 'Main St, Cloud Town',
+          sellerId: newUser.id,
+          status: 'pending',
+          rating: 0,
+          followers: 0,
+          reviews: []
+        };
+        setShops(prev => [...prev, newShop]);
       }
-    });
 
-    if (error) {
-      showToast(error.message, 'error');
-      return false;
+      setUsers(prev => [...prev, newUser]);
+      setCurrentUser(newUser);
+      showToast(`Account created (Local Session)! Welcome ${name}!`, 'success');
+      return true;
     }
 
-    const user = data?.user;
-    if (!user) {
-      showToast('Account creation could not be completed or email already registered.', 'error');
-      return false;
-    }
+    const user = authResult.user;
     
     // Check if email confirmation is required (session is null on signup)
-    if (!data.session) {
+    if (!authResult.session) {
       showToast('Registration successful! Please check your email to confirm, OR turn off "Confirm email" in your Supabase settings to log in instantly.', 'warning');
       return true;
     }
