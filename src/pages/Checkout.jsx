@@ -43,7 +43,12 @@ export default function Checkout() {
   }).filter(item => item.product !== undefined);
 
   const subtotal = cartItemsWithDetails.reduce((sum, item) => {
-    const finalPrice = item.product.price * (1 - (item.product.discount || 0) / 100);
+    const matchingVariant = item.product.variants?.find(v => 
+      (!v.size || v.size === item.size) && 
+      (!v.color || v.color === item.color)
+    );
+    const displayPrice = matchingVariant ? Number(matchingVariant.price) : item.product.price;
+    const finalPrice = displayPrice * (1 - (item.product.discount || 0) / 100);
     return sum + (finalPrice * item.quantity);
   }, 0);
 
@@ -151,7 +156,12 @@ export default function Checkout() {
               ) : (
                 <div className="cart-list">
                   {cartItemsWithDetails.map(item => {
-                    const finalPrice = item.product.price * (1 - (item.product.discount || 0) / 100);
+                    const matchingVariant = item.product.variants?.find(v => 
+                      (!v.size || v.size === item.size) && 
+                      (!v.color || v.color === item.color)
+                    );
+                    const displayPrice = matchingVariant ? Number(matchingVariant.price) : item.product.price;
+                    const finalPrice = displayPrice * (1 - (item.product.discount || 0) / 100);
                     return (
                       <div key={`${item.productId}-${item.color}-${item.size}`} className="cart-item-row">
                         <img src={item.product.images[0]} alt="" className="cart-item-img" />
@@ -174,15 +184,15 @@ export default function Checkout() {
                             </div>
                             
                             <button onClick={() => removeFromCart(item.productId, item.color, item.size)} className="remove-item-btn" aria-label="Remove item">
-                              <Trash2 size={16} /> Remove
+                                <Trash2 size={16} /> Remove
                             </button>
                           </div>
                         </div>
 
                         <div className="cart-item-price-col">
-                          <span className="cart-item-price">${(finalPrice * item.quantity).toFixed(2)}</span>
+                          <span className="cart-item-price">{item.product.currency || '$'}{(finalPrice * item.quantity).toFixed(2)}</span>
                           {item.product.discount > 0 && (
-                            <span className="cart-item-savings">Saved ${((item.product.price - finalPrice) * item.quantity).toFixed(2)}</span>
+                            <span className="cart-item-savings">Saved {item.product.currency || '$'}{((displayPrice - finalPrice) * item.quantity).toFixed(2)}</span>
                           )}
                         </div>
                       </div>
@@ -441,18 +451,26 @@ export default function Checkout() {
                 {cartItemsWithDetails.length === 0 ? (
                   <p className="no-summary-items">No items in your cart.</p>
                 ) : (
-                  cartItemsWithDetails.map((item, idx) => (
-                    <div key={idx} className="summary-item-row">
-                      <div className="sum-item-left">
-                        <img src={item.product.images[0]} alt="" className="sum-item-img" />
-                        <div>
-                          <p className="sum-item-name">{item.product.name}</p>
-                          <span className="sum-item-qty">Qty: {item.quantity}</span>
+                  cartItemsWithDetails.map((item, idx) => {
+                    const matchingVariant = item.product.variants?.find(v => 
+                      (!v.size || v.size === item.size) && 
+                      (!v.color || v.color === item.color)
+                    );
+                    const displayPrice = matchingVariant ? Number(matchingVariant.price) : item.product.price;
+                    const finalPrice = displayPrice * (1 - (item.product.discount || 0) / 100);
+                    return (
+                      <div key={idx} className="summary-item-row">
+                        <div className="sum-item-left">
+                          <img src={item.product.images[0]} alt="" className="sum-item-img" />
+                          <div>
+                            <p className="sum-item-name">{item.product.name}</p>
+                            <span className="sum-item-qty">Qty: {item.quantity}</span>
+                          </div>
                         </div>
+                        <span className="sum-item-price">{item.product.currency || '$'}{(finalPrice * item.quantity).toFixed(2)}</span>
                       </div>
-                      <span className="sum-item-price">${(item.product.price * (1 - (item.product.discount || 0) / 100) * item.quantity).toFixed(2)}</span>
-                    </div>
-                  ))
+                    );
+                  })
                 )}
               </div>
 

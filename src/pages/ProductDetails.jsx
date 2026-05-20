@@ -64,7 +64,12 @@ export default function ProductDetails() {
     .filter(p => p.category === product.category && p.id !== product.id && !p.hidden)
     .slice(0, 3);
 
-  const discountedPrice = product.price * (1 - (product.discount || 0) / 100);
+  const matchingVariant = product.variants?.find(v => 
+    (!v.size || v.size === selectedSize) && 
+    (!v.color || v.color === selectedColor)
+  );
+  const displayPrice = matchingVariant ? Number(matchingVariant.price) : product.price;
+  const discountedPrice = displayPrice * (1 - (product.discount || 0) / 100);
 
   const handleQtyChange = (val) => {
     const newQty = quantity + val;
@@ -103,28 +108,57 @@ export default function ProductDetails() {
       {/* Product Details Section */}
       <div className="product-details-grid card">
         
-        {/* Left Side: Images */}
+        {/* Left Side: Images & Video */}
         <div className="details-images-col">
-          <div className="main-image-wrapper">
-            <img src={activeImage} alt={product.name} className="main-image" />
+          <div className="main-image-wrapper" style={{ position: 'relative', borderRadius: '16px', overflow: 'hidden', aspectRatio: '1', background: '#F8F9FA', border: '1px solid var(--border-color)' }}>
+            {activeImage && (activeImage.startsWith('data:video/') || activeImage.endsWith('.mp4') || activeImage.includes('/video/') || activeImage === product.video) ? (
+              <video 
+                src={activeImage} 
+                controls 
+                autoPlay 
+                muted 
+                loop 
+                className="main-image" 
+                style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+              />
+            ) : (
+              <img src={activeImage} alt={product.name} className="main-image" style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} />
+            )}
             {product.discount > 0 && (
               <span className="details-discount-badge">-{product.discount}% Off</span>
             )}
           </div>
           
-          {product.images.length > 1 && (
-            <div className="thumbnails-grid">
-              {product.images.map((img, idx) => (
-                <button 
-                  key={idx} 
-                  onClick={() => setActiveImage(img)}
-                  className={`thumbnail-btn ${activeImage === img ? 'active' : ''}`}
-                >
-                  <img src={img} alt="" />
-                </button>
-              ))}
-            </div>
-          )}
+          <div className="thumbnails-grid" style={{ display: 'flex', gap: '8px', marginTop: '10px', flexWrap: 'wrap' }}>
+            {product.images && product.images.map((img, idx) => (
+              <button 
+                key={idx} 
+                onClick={() => setActiveImage(img)}
+                className={`thumbnail-btn ${activeImage === img ? 'active' : ''}`}
+                style={{ width: '60px', height: '60px', borderRadius: '8px', overflow: 'hidden', padding: 0, border: activeImage === img ? '2px solid var(--primary)' : '1px solid var(--border-color)' }}
+              >
+                <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              </button>
+            ))}
+            {product.video && (
+              <button 
+                onClick={() => setActiveImage(product.video)}
+                className={`thumbnail-btn video-thumb-btn ${activeImage === product.video ? 'active' : ''}`}
+                style={{ 
+                  width: '60px', height: '60px', borderRadius: '8px', overflow: 'hidden', padding: 0,
+                  position: 'relative', background: '#000', display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  border: activeImage === product.video ? '2px solid var(--primary)' : '1px solid var(--border-color)'
+                }}
+              >
+                {product.video.startsWith('data:') ? (
+                  <video src={product.video} style={{ width: '100%', height: '100%', objectFit: 'cover', opacity: 0.6 }} />
+                ) : (
+                  <div style={{ width: '100%', height: '100%', background: '#333', opacity: 0.8 }} />
+                )}
+                <span style={{ position: 'absolute', fontSize: '1.2rem', color: 'white', zIndex: 1 }}>🎥</span>
+              </button>
+            )}
+          </div>
         </div>
 
         {/* Right Side: Product Info */}
@@ -138,17 +172,22 @@ export default function ProductDetails() {
               </div>
               <span className="reviews-count">({product.reviews.length} customer reviews)</span>
             </div>
+            {(product.shortDescription || product.shortDesc) && (
+              <p className="product-short-description" style={{ color: 'var(--text-secondary)', fontSize: '1rem', fontStyle: 'italic', margin: '8px 0 15px' }}>
+                {product.shortDescription || product.shortDesc}
+              </p>
+            )}
           </div>
 
           {/* Pricing Block */}
           <div className="pricing-box">
             {product.discount > 0 ? (
               <div className="discounted-price-row">
-                <span className="old-price">${product.price.toFixed(2)}</span>
-                <span className="current-price">${discountedPrice.toFixed(2)}</span>
+                <span className="old-price">{product.currency || '$'}{displayPrice.toFixed(2)}</span>
+                <span className="current-price">{product.currency || '$'}{discountedPrice.toFixed(2)}</span>
               </div>
             ) : (
-              <span className="current-price">${product.price.toFixed(2)}</span>
+              <span className="current-price">{product.currency || '$'}{displayPrice.toFixed(2)}</span>
             )}
             
             <div className="stock-status">
@@ -164,7 +203,17 @@ export default function ProductDetails() {
             </div>
           </div>
 
-          <p className="product-description">{product.description}</p>
+          <p className="product-description" style={{ lineHeight: '1.6', color: 'var(--text-main)' }}>{product.description}</p>
+
+          {product.tags && product.tags.length > 0 && (
+            <div className="product-tags-row" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', margin: '15px 0' }}>
+              {product.tags.map((tag, idx) => (
+                <span key={idx} className="badge badge-primary-light" style={{ padding: '4px 10px', borderRadius: '20px', fontSize: '0.75rem', background: 'var(--primary-light)', color: 'var(--primary)' }}>
+                  {tag.startsWith('#') ? tag : `#${tag}`}
+                </span>
+              ))}
+            </div>
+          )}
 
           <hr className="divider" />
 
@@ -373,7 +422,7 @@ export default function ProductDetails() {
                   <img src={rec.images[0]} alt={rec.name} className="rec-img" />
                   <div className="rec-details">
                     <h4 className="rec-title">{rec.name}</h4>
-                    <span className="rec-price">${rec.price.toFixed(2)}</span>
+                    <span className="rec-price">{rec.currency || '$'}{rec.price.toFixed(2)}</span>
                   </div>
                 </Link>
               ))

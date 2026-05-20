@@ -23,18 +23,49 @@ export default function SellerDashboard() {
   
   // Product Form states
   const [prodName, setProdName] = useState('');
+  const [prodShortDesc, setProdShortDesc] = useState('');
   const [prodDesc, setProdDesc] = useState('');
   const [prodPrice, setProdPrice] = useState('');
-  const [prodDiscount, setProdDiscount] = useState('');
+  const [prodSalePrice, setProdSalePrice] = useState('');
+  const [prodDiscount, setProdDiscount] = useState('0');
+  const [prodCurrency, setProdCurrency] = useState('$');
   const [prodStock, setProdStock] = useState('');
+  const [prodSku, setProdSku] = useState('');
+  const [prodStatus, setProdStatus] = useState('In Stock');
   const [prodCategory, setProdCategory] = useState('T-Shirts');
   const [prodSubcat, setProdSubcat] = useState('');
   const [prodImages, setProdImages] = useState('');
+  const [prodVideo, setProdVideo] = useState('');
   const [prodSizes, setProdSizes] = useState('');
   const [prodColors, setProdColors] = useState('');
   const [prodTags, setProdTags] = useState('');
-  const [prodDelivery, setProdDelivery] = useState('');
-  const [prodReturn, setProdReturn] = useState('');
+  const [prodDelivery, setProdDelivery] = useState('Ships in 1-2 business days.');
+  const [prodReturn, setProdReturn] = useState('Returns accepted within 7 days.');
+  
+  // New shipping state
+  const [prodWeight, setProdWeight] = useState('');
+  const [prodDimensions, setProdDimensions] = useState('');
+  const [prodShippingCost, setProdShippingCost] = useState('');
+  const [prodShippingCountries, setProdShippingCountries] = useState('Worldwide');
+  
+  // New SEO state
+  const [prodMetaTitle, setProdMetaTitle] = useState('');
+  const [prodMetaDesc, setProdMetaDesc] = useState('');
+  const [prodSlug, setProdSlug] = useState('');
+  
+  // New Variants state
+  const [hasVariants, setHasVariants] = useState(false);
+  const [prodVariants, setProdVariants] = useState([]);
+  
+  // Option names & values for variant generator
+  const [variantOpt1Name, setVariantOpt1Name] = useState('Size');
+  const [variantOpt1Values, setVariantOpt1Values] = useState('S, M, L');
+  const [variantOpt2Name, setVariantOpt2Name] = useState('Color');
+  const [variantOpt2Values, setVariantOpt2Values] = useState('Red, Black');
+  
+  // Tab section within add product form
+  const [formSection, setFormSection] = useState('basic');
+  const [isDragging, setIsDragging] = useState(false);
 
   // Shop Details Edit States
   const [shopNameForm, setShopNameForm] = useState('');
@@ -141,37 +172,165 @@ export default function SellerDashboard() {
   const openAddProductModal = () => {
     setEditingProductId(null);
     setProdName('');
+    setProdShortDesc('');
     setProdDesc('');
     setProdPrice('');
+    setProdSalePrice('');
     setProdDiscount('0');
+    setProdCurrency('$');
     setProdStock('');
+    setProdSku('');
+    setProdStatus('In Stock');
     setProdCategory('T-Shirts');
     setProdSubcat('');
     setProdImages('https://images.unsplash.com/photo-1559251606-c623743a6d76?w=600&auto=format&fit=crop&q=80');
-    setProdSizes('Small, Medium, Large');
-    setProdColors('Pastel Pink, Creamy White');
+    setProdVideo('');
+    setProdSizes('S, M, L');
+    setProdColors('Red, Black');
     setProdTags('cute, handmade, plushie');
     setProdDelivery('Ships in 1-2 business days.');
     setProdReturn('Returns accepted within 7 days.');
+    setProdWeight('0.5 kg');
+    setProdDimensions('20cm x 15cm x 10cm');
+    setProdShippingCost('5.00');
+    setProdShippingCountries('Worldwide');
+    setProdMetaTitle('');
+    setProdMetaDesc('');
+    setProdSlug('');
+    setHasVariants(false);
+    setProdVariants([]);
+    setFormSection('basic');
     setShowProductModal(true);
   };
 
   const openEditProductModal = (product) => {
     setEditingProductId(product.id);
     setProdName(product.name);
-    setProdDesc(product.description);
-    setProdPrice(product.price);
-    setProdDiscount(product.discount || 0);
-    setProdStock(product.stock);
-    setProdCategory(product.category);
+    setProdShortDesc(product.shortDescription || '');
+    setProdDesc(product.description || '');
+    setProdPrice(product.price || '');
+    setProdDiscount(product.discount !== undefined ? product.discount : '0');
+    
+    // Set Sale Price
+    const original = Number(product.price) || 0;
+    const discount = Number(product.discount) || 0;
+    const sale = discount > 0 ? original * (1 - discount / 100) : original;
+    setProdSalePrice(sale.toFixed(2));
+    
+    setProdCurrency(product.currency || '$');
+    setProdStock(product.stock || '');
+    setProdSku(product.sku || '');
+    setProdStatus(product.status || 'In Stock');
+    setProdCategory(product.category || 'T-Shirts');
     setProdSubcat(product.subcategory || '');
-    setProdImages(product.images.join(', '));
+    setProdImages(product.images ? product.images.join(', ') : '');
+    setProdVideo(product.video || '');
     setProdSizes(product.sizes ? product.sizes.join(', ') : '');
     setProdColors(product.colors ? product.colors.join(', ') : '');
     setProdTags(product.tags ? product.tags.join(', ') : '');
     setProdDelivery(product.deliveryDetails || '');
     setProdReturn(product.returnPolicy || '');
+    
+    // New Shipping
+    setProdWeight(product.weight || '');
+    setProdDimensions(product.dimensions || '');
+    setProdShippingCost(product.shippingCost !== undefined ? product.shippingCost.toString() : '');
+    setProdShippingCountries(product.shippingCountries || 'Worldwide');
+    
+    // SEO
+    setProdMetaTitle(product.metaTitle || '');
+    setProdMetaDesc(product.metaDescription || '');
+    setProdSlug(product.slug || '');
+    
+    // Variants
+    const hasVars = product.variants && product.variants.length > 0;
+    setHasVariants(hasVars);
+    setProdVariants(product.variants || []);
+    
+    setFormSection('basic');
     setShowProductModal(true);
+  };
+
+  // Pricing Interactions
+  const handleOriginalPriceChange = (val) => {
+    setProdPrice(val);
+    const original = Number(val);
+    const discount = Number(prodDiscount);
+    if (original > 0 && discount >= 0) {
+      const calculatedSale = original * (1 - discount / 100);
+      setProdSalePrice(calculatedSale.toFixed(2));
+    } else {
+      setProdSalePrice(val);
+    }
+  };
+
+  const handleSalePriceChange = (val) => {
+    setProdSalePrice(val);
+    const sale = Number(val);
+    const original = Number(prodPrice);
+    if (original > 0 && sale > 0 && original >= sale) {
+      const calculatedDiscount = ((original - sale) / original) * 100;
+      setProdDiscount(Math.round(calculatedDiscount).toString());
+    } else if (original > 0 && original < sale) {
+      setProdDiscount('0');
+    }
+  };
+
+  const handleDiscountChange = (val) => {
+    setProdDiscount(val);
+    const discount = Number(val);
+    const original = Number(prodPrice);
+    if (original > 0 && discount >= 0 && discount <= 100) {
+      const calculatedSale = original * (1 - discount / 100);
+      setProdSalePrice(calculatedSale.toFixed(2));
+    }
+  };
+
+  // Shopify style dynamic variant combinatorics generator
+  const generateCombinations = () => {
+    const opt1Vals = variantOpt1Values.split(',').map(v => v.trim()).filter(Boolean);
+    const opt2Vals = variantOpt2Values.split(',').map(v => v.trim()).filter(Boolean);
+    
+    let combos = [];
+    if (opt1Vals.length > 0 && opt2Vals.length > 0) {
+      opt1Vals.forEach(v1 => {
+        opt2Vals.forEach(v2 => {
+          combos.push({
+            size: v1,
+            color: v2,
+            material: 'Standard',
+            price: Number(prodPrice) || 0,
+            stock: Number(prodStock) || 0,
+            sku: `${prodSku || 'SKU'}-${v1}-${v2}`.toUpperCase()
+          });
+        });
+      });
+    } else if (opt1Vals.length > 0) {
+      opt1Vals.forEach(v1 => {
+        combos.push({
+          size: v1,
+          color: 'Default',
+          material: 'Standard',
+          price: Number(prodPrice) || 0,
+          stock: Number(prodStock) || 0,
+          sku: `${prodSku || 'SKU'}-${v1}`.toUpperCase()
+        });
+      });
+    } else if (opt2Vals.length > 0) {
+      opt2Vals.forEach(v2 => {
+        combos.push({
+          size: 'Default',
+          color: v2,
+          material: 'Standard',
+          price: Number(prodPrice) || 0,
+          stock: Number(prodStock) || 0,
+          sku: `${prodSku || 'SKU'}-${v2}`.toUpperCase()
+        });
+      });
+    }
+    
+    setProdVariants(combos);
+    showToast(`Generated ${combos.length} variant combinations!`, 'info');
   };
 
   const handleProductSubmit = (e) => {
@@ -181,8 +340,11 @@ export default function SellerDashboard() {
     const colorsArray = prodColors.split(',').map(c => c.trim()).filter(c => c !== '');
     const tagsArray = prodTags.split(',').map(t => t.trim()).filter(t => t !== '');
 
+    const generatedSlug = prodSlug || prodName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
+
     const productData = {
       name: prodName,
+      shortDescription: prodShortDesc,
       description: prodDesc,
       price: Number(prodPrice),
       discount: Number(prodDiscount) || 0,
@@ -190,11 +352,30 @@ export default function SellerDashboard() {
       category: prodCategory,
       subcategory: prodSubcat,
       images: imagesArray.length > 0 ? imagesArray : ['https://images.unsplash.com/photo-1559251606-c623743a6d76?w=600&auto=format&fit=crop&q=80'],
+      video: prodVideo,
+      currency: prodCurrency,
+      sku: prodSku,
+      status: prodStatus,
       sizes: sizesArray,
       colors: colorsArray,
       tags: tagsArray,
       deliveryDetails: prodDelivery,
       returnPolicy: prodReturn,
+      
+      // shipping
+      weight: prodWeight,
+      dimensions: prodDimensions,
+      shippingCost: Number(prodShippingCost) || 0,
+      shippingCountries: prodShippingCountries,
+      
+      // seo
+      metaTitle: prodMetaTitle || prodName,
+      metaDescription: prodMetaDesc || prodShortDesc || prodDesc.slice(0, 150),
+      slug: generatedSlug,
+      
+      // variants
+      variants: hasVariants ? prodVariants : [],
+      
       shopId: sellerShop.id,
       sellerId: currentUser.id
     };
@@ -223,6 +404,611 @@ export default function SellerDashboard() {
       // Force trigger state sync
       setActiveTab('orders');
     }
+  };
+
+  const renderProductFormFields = () => {
+    const sections = [
+      { id: 'basic', label: '🌸 Basic Details' },
+      { id: 'media', label: '📸 Images & Media' },
+      { id: 'pricing', label: '💰 Pricing & Stock' },
+      { id: 'variants', label: '✨ Shopify Variants' },
+      { id: 'shipping', label: '🚚 Shipping' },
+      { id: 'seo', label: '🔍 SEO & Slug' }
+    ];
+
+    return (
+      <div className="premium-form-layout" style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+        {/* Form Section Navigation */}
+        <div className="form-section-nav" style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', background: 'var(--primary-light)', padding: '6px', borderRadius: '12px' }}>
+          {sections.map(sec => (
+            <button 
+              key={sec.id} 
+              type="button" 
+              onClick={() => setFormSection(sec.id)} 
+              className={`btn small-btn ${formSection === sec.id ? 'btn-primary' : 'btn-ghost'}`}
+              style={{ padding: '6px 14px', borderRadius: '8px', fontSize: '0.8rem', margin: 0 }}
+            >
+              {sec.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Section Contents */}
+        <div className="section-contents-wrapper" style={{ padding: '5px' }}>
+          {/* SECTION 1: BASIC DETAILS */}
+          {formSection === 'basic' && (
+            <div className="section-pane animate-fade">
+              <div className="form-group">
+                <label className="form-label">Product Name</label>
+                <input 
+                  type="text" 
+                  value={prodName} 
+                  onChange={(e) => {
+                    setProdName(e.target.value);
+                    if (!editingProductId) {
+                      setProdSlug(e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, ''));
+                      setProdMetaTitle(e.target.value);
+                    }
+                  }}
+                  className="form-control"
+                  placeholder="e.g. Dreamy Cloud Handwoven Cushion"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Short Description</label>
+                <input 
+                  type="text" 
+                  value={prodShortDesc} 
+                  onChange={(e) => setProdShortDesc(e.target.value)}
+                  className="form-control"
+                  placeholder="A cute, concise one-line highlight..."
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Full Product Description</label>
+                <textarea 
+                  value={prodDesc} 
+                  onChange={(e) => setProdDesc(e.target.value)}
+                  className="form-control"
+                  rows={4}
+                  placeholder="Describe your creative process, material feel, and handcrafted story..."
+                  required
+                />
+              </div>
+
+              <div className="grid-cols-2">
+                <div className="form-group">
+                  <label className="form-label">Primary Category</label>
+                  <select 
+                    value={prodCategory} 
+                    onChange={(e) => setProdCategory(e.target.value)}
+                    className="form-control"
+                  >
+                    <option value="T-Shirts">T-Shirts</option>
+                    <option value="Birthday Kit">Birthday Kit</option>
+                    <option value="Caps">Caps</option>
+                    <option value="Posters">Posters</option>
+                    <option value="Gifts">Gifts</option>
+                    <option value="Other">Other</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Subcategory</label>
+                  <input 
+                    type="text" 
+                    placeholder="e.g. Cushions" 
+                    value={prodSubcat} 
+                    onChange={(e) => setProdSubcat(e.target.value)}
+                    className="form-control"
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Tags (e.g. #handmade #gift)</label>
+                <input 
+                  type="text" 
+                  placeholder="#handmade, #gift, #cute, #plushie" 
+                  value={prodTags} 
+                  onChange={(e) => setProdTags(e.target.value)}
+                  className="form-control"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* SECTION 2: IMAGES & MEDIA */}
+          {formSection === 'media' && (
+            <div className="section-pane animate-fade" style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
+              {/* Drag & Drop Visual Area */}
+              <div className="form-group">
+                <label className="form-label">Media Upload Zone</label>
+                <div 
+                  className={`drag-drop-zone ${isDragging ? 'dragging' : ''}`}
+                  onDragOver={(e) => { e.preventDefault(); setIsDragging(true); }}
+                  onDragLeave={() => setIsDragging(false)}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    setIsDragging(false);
+                    const files = Array.from(e.dataTransfer.files);
+                    const promises = files.map(file => {
+                      return new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onloadend = () => resolve(reader.result);
+                        reader.readAsDataURL(file);
+                      });
+                    });
+                    Promise.all(promises).then(newImages => {
+                      const currentImages = prodImages ? prodImages.split(',').map(i => i.trim()).filter(Boolean) : [];
+                      setProdImages([...currentImages, ...newImages].join(', '));
+                      showToast(`Added ${newImages.length} photos successfully!`, 'success');
+                    });
+                  }}
+                  style={{
+                    border: '2px dashed var(--primary)',
+                    borderRadius: '12px',
+                    padding: '30px',
+                    textAlign: 'center',
+                    background: isDragging ? 'var(--primary-light)' : 'var(--bg-card)',
+                    cursor: 'pointer',
+                    transition: 'all var(--transition-fast)'
+                  }}
+                >
+                  <span style={{ fontSize: '2rem', display: 'block', marginBottom: '8px' }}>🌸</span>
+                  <strong>Drag & drop product images here</strong>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--text-secondary)', margin: '4px 0 12px' }}>Supports PNG, JPG, JPEG, SVG up to 5MB</p>
+                  
+                  <label className="btn btn-secondary small-btn" style={{ cursor: 'pointer', display: 'inline-flex', margin: 0 }}>
+                    Browse Files
+                    <input 
+                      type="file" 
+                      accept="image/*" 
+                      multiple 
+                      style={{ display: 'none' }}
+                      onChange={(e) => {
+                        const files = Array.from(e.target.files);
+                        const promises = files.map(file => {
+                          return new Promise((resolve) => {
+                            const reader = new FileReader();
+                            reader.onloadend = () => resolve(reader.result);
+                            reader.readAsDataURL(file);
+                          });
+                        });
+                        Promise.all(promises).then(newImages => {
+                          const currentImages = prodImages ? prodImages.split(',').map(i => i.trim()).filter(Boolean) : [];
+                          setProdImages([...currentImages, ...newImages].join(', '));
+                          showToast(`Uploaded ${newImages.length} images!`, 'success');
+                        });
+                      }}
+                    />
+                  </label>
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Product Image URLs (Comma Separated)</label>
+                <textarea 
+                  placeholder="Paste cover URL and additional photo URLs separated by commas..."
+                  value={prodImages} 
+                  onChange={(e) => setProdImages(e.target.value)}
+                  className="form-control"
+                  rows={3}
+                  required
+                />
+              </div>
+
+              {/* Gallery Preview Box */}
+              {prodImages.split(',').map(i => i.trim()).filter(Boolean).length > 0 && (
+                <div className="form-group">
+                  <label className="form-label">Image Gallery Preview ({prodImages.split(',').map(i => i.trim()).filter(Boolean).length} items)</label>
+                  <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '5px' }}>
+                    {prodImages.split(',').map(i => i.trim()).filter(Boolean).map((img, idx) => (
+                      <div key={idx} style={{ position: 'relative', width: '70px', height: '70px', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--border-color)' }}>
+                        <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        <button 
+                          type="button" 
+                          onClick={() => {
+                            const remaining = prodImages.split(',').map(i => i.trim()).filter(Boolean).filter((_, index) => index !== idx);
+                            setProdImages(remaining.join(', '));
+                          }} 
+                          style={{
+                            position: 'absolute', top: '2px', right: '2px', background: 'rgba(239, 68, 68, 0.85)', color: 'white',
+                            border: 'none', borderRadius: '50%', width: '16px', height: '16px', fontSize: '10px', cursor: 'pointer',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center'
+                          }}
+                        >
+                          ×
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="form-group">
+                <label className="form-label">Product Video Upload / URL</label>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <input 
+                    type="text" 
+                    placeholder="Paste mp4 video link or upload below..." 
+                    value={prodVideo} 
+                    onChange={(e) => setProdVideo(e.target.value)}
+                    className="form-control"
+                    style={{ flex: 1 }}
+                  />
+                  <label className="btn btn-outline" style={{ display: 'inline-flex', alignItems: 'center', cursor: 'pointer', margin: 0, padding: '0 15px', whiteSpace: 'nowrap' }}>
+                    📂 Upload Video
+                    <input 
+                      type="file" 
+                      accept="video/*" 
+                      style={{ display: 'none' }}
+                      onChange={(e) => {
+                        const file = e.target.files[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onloadend = () => {
+                            setProdVideo(reader.result);
+                            showToast('Video uploaded successfully!', 'success');
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                    />
+                  </label>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* SECTION 3: PRICING & INVENTORY */}
+          {formSection === 'pricing' && (
+            <div className="section-pane animate-fade">
+              <div className="grid-cols-2">
+                <div className="form-group">
+                  <label className="form-label">Currency</label>
+                  <select 
+                    value={prodCurrency} 
+                    onChange={(e) => setProdCurrency(e.target.value)}
+                    className="form-control"
+                  >
+                    <option value="$">US Dollar ($)</option>
+                    <option value="€">Euro (€)</option>
+                    <option value="£">British Pound (£)</option>
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Original Price</label>
+                  <input 
+                    type="number" 
+                    step="0.01"
+                    value={prodPrice} 
+                    onChange={(e) => handleOriginalPriceChange(e.target.value)}
+                    className="form-control"
+                    placeholder="0.00"
+                    required
+                  />
+                </div>
+              </div>
+
+              <div className="grid-cols-2">
+                <div className="form-group">
+                  <label className="form-label">Discount (%)</label>
+                  <input 
+                    type="number" 
+                    min="0"
+                    max="100"
+                    value={prodDiscount} 
+                    onChange={(e) => handleDiscountChange(e.target.value)}
+                    className="form-control"
+                    placeholder="0"
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Sale Price</label>
+                  <input 
+                    type="number" 
+                    step="0.01"
+                    value={prodSalePrice} 
+                    onChange={(e) => handleSalePriceChange(e.target.value)}
+                    className="form-control"
+                    placeholder="0.00"
+                  />
+                </div>
+              </div>
+
+              <hr className="divider" style={{ margin: '15px 0' }} />
+
+              <div className="grid-cols-3">
+                <div className="form-group">
+                  <label className="form-label">Stock Quantity</label>
+                  <input 
+                    type="number" 
+                    value={prodStock} 
+                    onChange={(e) => setProdStock(e.target.value)}
+                    className="form-control"
+                    placeholder="e.g. 50"
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">SKU (Stock Keeping Unit)</label>
+                  <input 
+                    type="text" 
+                    value={prodSku} 
+                    onChange={(e) => setProdSku(e.target.value)}
+                    className="form-control"
+                    placeholder="e.g. SK-CLD-CUSH-01"
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Inventory Status</label>
+                  <select 
+                    value={prodStatus} 
+                    onChange={(e) => setProdStatus(e.target.value)}
+                    className="form-control"
+                  >
+                    <option value="In Stock">In Stock</option>
+                    <option value="Out of Stock">Out of Stock</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* SECTION 4: VARIANTS (SHOPIFY STYLE) */}
+          {formSection === 'variants' && (
+            <div className="section-pane animate-fade">
+              <div className="form-group" style={{ flexDirection: 'row', alignItems: 'center', gap: '10px' }}>
+                <input 
+                  type="checkbox" 
+                  id="hasVariantsToggle"
+                  checked={hasVariants} 
+                  onChange={(e) => setHasVariants(e.target.checked)}
+                  style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                />
+                <label htmlFor="hasVariantsToggle" className="form-label" style={{ margin: 0, cursor: 'pointer' }}>
+                  This product has multiple variants (e.g. sizes, colors)
+                </label>
+              </div>
+
+              {hasVariants && (
+                <div className="shopify-variants-editor card bg-light" style={{ padding: '15px', marginTop: '10px' }}>
+                  <h4>Generate Variants</h4>
+                  <p className="subtitle" style={{ fontSize: '0.8rem', color: 'var(--text-secondary)' }}>Specify options to generate stock combos instantly</p>
+                  
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '15px', margin: '15px 0' }}>
+                    <div className="form-group">
+                      <label className="form-label">Option 1 (e.g. Size)</label>
+                      <input 
+                        type="text" 
+                        value={variantOpt1Name} 
+                        onChange={(e) => setVariantOpt1Name(e.target.value)}
+                        className="form-control"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Option 1 Values (comma separated)</label>
+                      <input 
+                        type="text" 
+                        value={variantOpt1Values} 
+                        onChange={(e) => setVariantOpt1Values(e.target.value)}
+                        className="form-control"
+                        placeholder="e.g. S, M, L"
+                      />
+                    </div>
+                  </div>
+
+                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '15px', margin: '15px 0' }}>
+                    <div className="form-group">
+                      <label className="form-label">Option 2 (e.g. Color)</label>
+                      <input 
+                        type="text" 
+                        value={variantOpt2Name} 
+                        onChange={(e) => setVariantOpt2Name(e.target.value)}
+                        className="form-control"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label className="form-label">Option 2 Values (comma separated)</label>
+                      <input 
+                        type="text" 
+                        value={variantOpt2Values} 
+                        onChange={(e) => setVariantOpt2Values(e.target.value)}
+                        className="form-control"
+                        placeholder="e.g. Red, Black"
+                      />
+                    </div>
+                  </div>
+
+                  <button 
+                    type="button" 
+                    onClick={generateCombinations}
+                    className="btn btn-secondary small-btn"
+                    style={{ width: '100%', marginBottom: '15px' }}
+                  >
+                    ⚡ Generate Variant Combinations
+                  </button>
+
+                  {/* Combination pricing + stock table */}
+                  {prodVariants.length > 0 && (
+                    <div className="table-wrapper" style={{ overflowX: 'auto' }}>
+                      <table className="dash-table compact" style={{ width: '100%', fontSize: '0.85rem' }}>
+                        <thead>
+                          <tr>
+                            <th>Variant Combination</th>
+                            <th>Price ({prodCurrency})</th>
+                            <th>Stock</th>
+                            <th>SKU</th>
+                            <th>Action</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {prodVariants.map((v, idx) => (
+                            <tr key={idx}>
+                              <td>
+                                <strong>
+                                  {v.size && v.color ? `${v.size} / ${v.color}` : v.size || v.color}
+                                </strong>
+                              </td>
+                              <td>
+                                <input 
+                                  type="number" 
+                                  step="0.01" 
+                                  value={v.price} 
+                                  onChange={(e) => {
+                                    const updated = [...prodVariants];
+                                    updated[idx].price = Number(e.target.value);
+                                    setProdVariants(updated);
+                                  }}
+                                  className="form-control compact" 
+                                  style={{ padding: '6px 10px', fontSize: '0.8rem' }}
+                                />
+                              </td>
+                              <td>
+                                <input 
+                                  type="number" 
+                                  value={v.stock} 
+                                  onChange={(e) => {
+                                    const updated = [...prodVariants];
+                                    updated[idx].stock = Number(e.target.value);
+                                    setProdVariants(updated);
+                                  }}
+                                  className="form-control compact" 
+                                  style={{ padding: '6px 10px', fontSize: '0.8rem' }}
+                                />
+                              </td>
+                              <td>
+                                <input 
+                                  type="text" 
+                                  value={v.sku} 
+                                  onChange={(e) => {
+                                    const updated = [...prodVariants];
+                                    updated[idx].sku = e.target.value;
+                                    setProdVariants(updated);
+                                  }}
+                                  className="form-control compact" 
+                                  style={{ padding: '6px 10px', fontSize: '0.8rem' }}
+                                />
+                              </td>
+                              <td>
+                                <button 
+                                  type="button" 
+                                  onClick={() => {
+                                    setProdVariants(prodVariants.filter((_, i) => i !== idx));
+                                  }}
+                                  style={{ border: 'none', background: 'transparent', color: '#EF4444', cursor: 'pointer', fontSize: '1rem' }}
+                                >
+                                  🗑️
+                                </button>
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          )}
+
+          {/* SECTION 5: SHIPPING */}
+          {formSection === 'shipping' && (
+            <div className="section-pane animate-fade">
+              <div className="grid-cols-2">
+                <div className="form-group">
+                  <label className="form-label">Weight</label>
+                  <input 
+                    type="text" 
+                    value={prodWeight} 
+                    onChange={(e) => setProdWeight(e.target.value)}
+                    className="form-control"
+                    placeholder="e.g. 0.5 kg"
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Dimensions</label>
+                  <input 
+                    type="text" 
+                    value={prodDimensions} 
+                    onChange={(e) => setProdDimensions(e.target.value)}
+                    className="form-control"
+                    placeholder="e.g. 20cm x 15cm x 10cm"
+                  />
+                </div>
+              </div>
+
+              <div className="grid-cols-2">
+                <div className="form-group">
+                  <label className="form-label">Shipping Cost ({prodCurrency})</label>
+                  <input 
+                    type="number" 
+                    step="0.01"
+                    value={prodShippingCost} 
+                    onChange={(e) => setProdShippingCost(e.target.value)}
+                    className="form-control"
+                    placeholder="0.00"
+                  />
+                </div>
+                <div className="form-group">
+                  <label className="form-label">Countries Available</label>
+                  <input 
+                    type="text" 
+                    value={prodShippingCountries} 
+                    onChange={(e) => setProdShippingCountries(e.target.value)}
+                    className="form-control"
+                    placeholder="Worldwide, USA, Europe, etc."
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* SECTION 6: SEO */}
+          {formSection === 'seo' && (
+            <div className="section-pane animate-fade">
+              <div className="form-group">
+                <label className="form-label">Product URL Slug</label>
+                <input 
+                  type="text" 
+                  value={prodSlug} 
+                  onChange={(e) => setProdSlug(e.target.value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, ''))}
+                  className="form-control"
+                  placeholder="e.g. dreamy-cloud-cushion"
+                  required
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Meta Search Title</label>
+                <input 
+                  type="text" 
+                  value={prodMetaTitle} 
+                  onChange={(e) => setProdMetaTitle(e.target.value)}
+                  className="form-control"
+                  placeholder="Appears on search engine header..."
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Meta Search Description</label>
+                <textarea 
+                  value={prodMetaDesc} 
+                  onChange={(e) => setProdMetaDesc(e.target.value)}
+                  className="form-control"
+                  rows={3}
+                  placeholder="Appears in search engine descriptions..."
+                />
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    );
   };
 
   // Render Create Shop panel if seller has no shop registered yet
@@ -558,123 +1344,15 @@ export default function SellerDashboard() {
 
           {/* TAB 2: ADD PRODUCT */}
           {activeTab === 'add-product' && (
-            <div className="card tab-pane-card">
+            <div className="card tab-pane-card animate-fade">
               <h3>Add New Product Listing</h3>
               <p className="subtitle">List a cute new item in your store catalog</p>
               <hr className="divider" style={{ margin: '15px 0' }} />
-
+ 
               <form onSubmit={handleProductSubmit} className="modal-product-form">
-                <div className="grid-scroll-box" style={{ maxHeight: 'none', overflowY: 'visible' }}>
-                  <div className="form-group">
-                    <label className="form-label">Product Name</label>
-                    <input 
-                      type="text" 
-                      value={prodName} 
-                      onChange={(e) => setProdName(e.target.value)}
-                      className="form-control"
-                      placeholder="e.g. Dreamy Cloud Cushion"
-                      required
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Product Description</label>
-                    <textarea 
-                      value={prodDesc} 
-                      onChange={(e) => setProdDesc(e.target.value)}
-                      className="form-control"
-                      rows={3}
-                      placeholder="Give it an adorable description..."
-                      required
-                    />
-                  </div>
-
-                  <div className="grid-cols-3">
-                    <div className="form-group">
-                      <label className="form-label">Base Price ($)</label>
-                      <input 
-                        type="number" 
-                        step="0.01"
-                        value={prodPrice} 
-                        onChange={(e) => setProdPrice(e.target.value)}
-                        className="form-control"
-                        required
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label className="form-label">Discount (%)</label>
-                      <input 
-                        type="number" 
-                        value={prodDiscount} 
-                        onChange={(e) => setProdDiscount(e.target.value)}
-                        className="form-control"
-                      />
-                    </div>
-                    <div className="form-group">
-                      <label className="form-label">Stock Qty</label>
-                      <input 
-                        type="number" 
-                        value={prodStock} 
-                        onChange={(e) => setProdStock(e.target.value)}
-                        className="form-control"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid-cols-2">
-                    <div className="form-group">
-                      <label className="form-label">Primary Category</label>
-                      <select 
-                        value={prodCategory} 
-                        onChange={(e) => setProdCategory(e.target.value)}
-                        className="form-control"
-                      >
-                        <option value="T-Shirts">T-Shirts</option>
-                        <option value="Birthday Kit">Birthday Kit</option>
-                        <option value="Caps">Caps</option>
-                        <option value="Posters">Posters</option>
-                        <option value="Gifts">Gifts</option>
-                      </select>
-                    </div>
-                    <div className="form-group">
-                      <label className="form-label">Subcategory</label>
-                      <input 
-                        type="text" 
-                        placeholder="e.g. Cushions" 
-                        value={prodSubcat} 
-                        onChange={(e) => setProdSubcat(e.target.value)}
-                        className="form-control"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Cover Image URL</label>
-                    <input 
-                      type="text" 
-                      placeholder="https://images.unsplash.com/..." 
-                      value={prodImages} 
-                      onChange={(e) => setProdImages(e.target.value)}
-                      className="form-control"
-                      required
-                    />
-                  </div>
-
-                  <div className="form-group">
-                    <label className="form-label">Tags (comma separated)</label>
-                    <input 
-                      type="text" 
-                      placeholder="aesthetic, cute, pastel" 
-                      value={prodTags} 
-                      onChange={(e) => setProdTags(e.target.value)}
-                      className="form-control"
-                    />
-                  </div>
-                </div>
-
-                <div style={{ marginTop: '20px' }}>
-                  <button type="submit" className="btn btn-primary" style={{ width: '100%' }}>Create Listing</button>
+                {renderProductFormFields()}
+                <div style={{ marginTop: '25px', display: 'flex', justifyContent: 'flex-end' }}>
+                  <button type="submit" className="btn btn-primary" style={{ width: '200px' }}>Create Listing</button>
                 </div>
               </form>
             </div>
@@ -1086,190 +1764,16 @@ export default function SellerDashboard() {
       {/* Add / Edit Product Modal */}
       {showProductModal && (
         <div className="modal-overlay">
-          <div className="modal-content card animate-fade">
+          <div className="modal-content card animate-fade" style={{ maxWidth: '750px', width: '90%' }}>
             <h3>{editingProductId ? 'Edit Product Details' : 'Add New Product Listing'}</h3>
             <hr className="divider" style={{ margin: '12px 0' }} />
 
             <form onSubmit={handleProductSubmit} className="modal-product-form">
-              <div className="grid-scroll-box">
-                
-                <div className="form-group">
-                  <label className="form-label">Product Name</label>
-                  <input 
-                    type="text" 
-                    value={prodName} 
-                    onChange={(e) => setProdName(e.target.value)}
-                    className="form-control"
-                    required
-                  />
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">Product Description</label>
-                  <textarea 
-                    value={prodDesc} 
-                    onChange={(e) => setProdDesc(e.target.value)}
-                    className="form-control"
-                    rows={3}
-                    required
-                  />
-                </div>
-
-                <div className="grid-cols-3">
-                  <div className="form-group">
-                    <label className="form-label">Base Price ($)</label>
-                    <input 
-                      type="number" 
-                      step="0.01"
-                      value={prodPrice} 
-                      onChange={(e) => setProdPrice(e.target.value)}
-                      className="form-control"
-                      required
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">Discount (%)</label>
-                    <input 
-                      type="number" 
-                      value={prodDiscount} 
-                      onChange={(e) => setProdDiscount(e.target.value)}
-                      className="form-control"
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">Stock Qty</label>
-                    <input 
-                      type="number" 
-                      value={prodStock} 
-                      onChange={(e) => setProdStock(e.target.value)}
-                      className="form-control"
-                      required
-                    />
-                  </div>
-                </div>
-
-                <div className="grid-cols-2">
-                  <div className="form-group">
-                    <label className="form-label">Primary Category</label>
-                    <select 
-                      value={prodCategory} 
-                      onChange={(e) => setProdCategory(e.target.value)}
-                      className="form-control"
-                    >
-                      <option value="T-Shirts">T-Shirts</option>
-                      <option value="Gifts">Gifts</option>
-                      <option value="Posters">Posters</option>
-                      <option value="Birthday Kit">Birthday Kit</option>
-                      <option value="Caps">Caps</option>
-                    </select>
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">Subcategory</label>
-                    <input 
-                      type="text" 
-                      placeholder="e.g. Cushions" 
-                      value={prodSubcat} 
-                      onChange={(e) => setProdSubcat(e.target.value)}
-                      className="form-control"
-                    />
-                  </div>
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">Product Images</label>
-                  <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-                    <input 
-                      type="text" 
-                      placeholder="Paste comma-separated URLs or upload below"
-                      value={prodImages} 
-                      onChange={(e) => setProdImages(e.target.value)}
-                      className="form-control"
-                      required
-                    />
-                    <label className="btn btn-secondary" style={{ alignSelf: 'flex-start', display: 'inline-flex', alignItems: 'center', cursor: 'pointer', gap: '8px', margin: 0 }}>
-                      📂 Upload Photos from Device
-                      <input 
-                        type="file" 
-                        accept="image/*" 
-                        multiple 
-                        style={{ display: 'none' }}
-                        onChange={(e) => {
-                          const files = Array.from(e.target.files);
-                          const promises = files.map(file => {
-                            return new Promise((resolve) => {
-                              const reader = new FileReader();
-                              reader.onloadend = () => resolve(reader.result);
-                              reader.readAsDataURL(file);
-                            });
-                          });
-                          Promise.all(promises).then(newImages => {
-                            const currentImages = prodImages ? prodImages.split(',').map(i => i.trim()).filter(Boolean) : [];
-                            setProdImages([...currentImages, ...newImages].join(', '));
-                          });
-                        }}
-                      />
-                    </label>
-                  </div>
-                </div>
-
-                <div className="grid-cols-2">
-                  <div className="form-group">
-                    <label className="form-label">Available Sizes (comma separated)</label>
-                    <input 
-                      type="text" 
-                      value={prodSizes} 
-                      onChange={(e) => setProdSizes(e.target.value)}
-                      className="form-control"
-                      placeholder="e.g. A5, A4"
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">Available Colors (comma separated)</label>
-                    <input 
-                      type="text" 
-                      value={prodColors} 
-                      onChange={(e) => setProdColors(e.target.value)}
-                      className="form-control"
-                      placeholder="e.g. Red, Blue"
-                    />
-                  </div>
-                </div>
-
-                <div className="form-group">
-                  <label className="form-label">Search Tags (comma separated)</label>
-                  <input 
-                    type="text" 
-                    value={prodTags} 
-                    onChange={(e) => setProdTags(e.target.value)}
-                    className="form-control"
-                    placeholder="e.g. washi, sticker"
-                  />
-                </div>
-
-                <div className="grid-cols-2">
-                  <div className="form-group">
-                    <label className="form-label">Delivery Timeline Description</label>
-                    <input 
-                      type="text" 
-                      value={prodDelivery} 
-                      onChange={(e) => setProdDelivery(e.target.value)}
-                      className="form-control"
-                    />
-                  </div>
-                  <div className="form-group">
-                    <label className="form-label">Return Policy Description</label>
-                    <input 
-                      type="text" 
-                      value={prodReturn} 
-                      onChange={(e) => setProdReturn(e.target.value)}
-                      className="form-control"
-                    />
-                  </div>
-                </div>
-
+              <div className="grid-scroll-box" style={{ maxHeight: '70vh', overflowY: 'auto', paddingRight: '5px' }}>
+                {renderProductFormFields()}
               </div>
 
-              <div className="modal-actions-row">
+              <div className="modal-actions-row" style={{ marginTop: '20px', display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
                 <button type="button" onClick={() => setShowProductModal(false)} className="btn btn-outline">Cancel</button>
                 <button type="submit" className="btn btn-secondary">Save Listing</button>
               </div>
