@@ -1,6 +1,6 @@
 import React from 'react';
-import { HashRouter as Router, Routes, Route } from 'react-router-dom';
-import { MarketplaceProvider } from './context/MarketplaceContext';
+import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
+import { MarketplaceProvider, useMarketplace } from './context/MarketplaceContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
 import Home from './pages/Home';
@@ -20,6 +20,86 @@ import Offers from './pages/Offers';
 import BestSellers from './pages/BestSellers';
 import Orders from './pages/Orders';
 
+// Guard: Only sellers can access this route
+function SellerRoute({ children }) {
+  const { currentUser } = useMarketplace();
+  if (!currentUser) return <Navigate to="/auth?role=seller" replace />;
+  if (currentUser.role !== 'seller') {
+    return (
+      <div style={{
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
+        justifyContent: 'center', minHeight: '60vh', gap: '16px',
+        fontFamily: 'var(--font-heading)', textAlign: 'center', padding: '40px'
+      }}>
+        <span style={{ fontSize: '3rem' }}>🚫</span>
+        <h2 style={{ color: 'var(--primary)' }}>Seller Access Only</h2>
+        <p style={{ color: 'var(--text-secondary)', maxWidth: '400px' }}>
+          The Seller Dashboard is only accessible to registered seller accounts.
+          Your current account is a <strong>{currentUser.role}</strong> account.
+        </p>
+        <a href="/#/auth?role=seller" style={{
+          padding: '10px 24px', background: 'var(--primary)', color: 'white',
+          borderRadius: '8px', textDecoration: 'none', fontWeight: '700'
+        }}>Login as Seller</a>
+      </div>
+    );
+  }
+  return children;
+}
+
+// Guard: Only buyers can access this route
+function BuyerRoute({ children }) {
+  const { currentUser } = useMarketplace();
+  if (!currentUser) return <Navigate to="/auth?role=buyer" replace />;
+  if (currentUser.role !== 'buyer') {
+    return (
+      <div style={{
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
+        justifyContent: 'center', minHeight: '60vh', gap: '16px',
+        fontFamily: 'var(--font-heading)', textAlign: 'center', padding: '40px'
+      }}>
+        <span style={{ fontSize: '3rem' }}>🚫</span>
+        <h2 style={{ color: 'var(--primary)' }}>Buyer Access Only</h2>
+        <p style={{ color: 'var(--text-secondary)', maxWidth: '400px' }}>
+          Your profile page is only accessible to buyer accounts.
+          Your current account is a <strong>{currentUser.role}</strong> account.
+        </p>
+        <a href="/#/auth?role=buyer" style={{
+          padding: '10px 24px', background: 'var(--primary)', color: 'white',
+          borderRadius: '8px', textDecoration: 'none', fontWeight: '700'
+        }}>Login as Buyer</a>
+      </div>
+    );
+  }
+  return children;
+}
+
+// Guard: Only admins can access this route
+function AdminRoute({ children }) {
+  const { currentUser } = useMarketplace();
+  if (!currentUser) return <Navigate to="/auth" replace />;
+  if (currentUser.role !== 'admin') {
+    return (
+      <div style={{
+        display: 'flex', flexDirection: 'column', alignItems: 'center',
+        justifyContent: 'center', minHeight: '60vh', gap: '16px',
+        fontFamily: 'var(--font-heading)', textAlign: 'center', padding: '40px'
+      }}>
+        <span style={{ fontSize: '3rem' }}>🔒</span>
+        <h2 style={{ color: 'var(--primary)' }}>Admin Access Only</h2>
+        <p style={{ color: 'var(--text-secondary)', maxWidth: '400px' }}>
+          This area requires administrator privileges.
+        </p>
+        <a href="/#/" style={{
+          padding: '10px 24px', background: 'var(--primary)', color: 'white',
+          borderRadius: '8px', textDecoration: 'none', fontWeight: '700'
+        }}>Go Home</a>
+      </div>
+    );
+  }
+  return children;
+}
+
 export default function App() {
   return (
     <MarketplaceProvider>
@@ -35,9 +115,9 @@ export default function App() {
               <Route path="/product/:productId" element={<ProductDetails />} />
               <Route path="/shop/:shopId" element={<Shop />} />
               <Route path="/checkout" element={<Checkout />} />
-              <Route path="/profile" element={<BuyerProfile />} />
-              <Route path="/seller-dashboard" element={<SellerDashboard />} />
-              <Route path="/admin" element={<AdminPanel />} />
+              <Route path="/profile" element={<BuyerRoute><BuyerProfile /></BuyerRoute>} />
+              <Route path="/seller-dashboard" element={<SellerRoute><SellerDashboard /></SellerRoute>} />
+              <Route path="/admin" element={<AdminRoute><AdminPanel /></AdminRoute>} />
               <Route path="/categories" element={<Categories />} />
               <Route path="/trending" element={<Trending />} />
               <Route path="/shops" element={<Shops />} />

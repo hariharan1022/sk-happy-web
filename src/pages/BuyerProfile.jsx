@@ -3,13 +3,13 @@ import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { useMarketplace } from '../context/MarketplaceContext';
 import { 
   User, ShoppingCart, Heart, Store, Edit2, 
-  MapPin, CheckCircle, Clock, Trash2, ArrowRight 
+  MapPin, CheckCircle, Clock, Trash2, ArrowRight, Camera 
 } from 'lucide-react';
 
 export default function BuyerProfile() {
   const { 
     currentUser, orders, wishlist, products, followedShops, 
-    shops, toggleWishlist, addToCart, followShop, showToast 
+    shops, toggleWishlist, addToCart, followShop, updateUser, showToast 
   } = useMarketplace();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
@@ -20,6 +20,14 @@ export default function BuyerProfile() {
   // Profile Edit fields
   const [name, setName] = useState(currentUser?.name || '');
   const [avatar, setAvatar] = useState(currentUser?.avatar || '');
+
+  // Sync form fields when currentUser changes (e.g. after login)
+  useEffect(() => {
+    if (currentUser) {
+      setName(currentUser.name || '');
+      setAvatar(currentUser.avatar || '');
+    }
+  }, [currentUser]);
 
   useEffect(() => {
     if (!currentUser) {
@@ -34,13 +42,29 @@ export default function BuyerProfile() {
     setSearchParams(searchParams);
   };
 
+  // Handle avatar file upload from device
+  const handleAvatarFileUpload = (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    
+    // Validate file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      showToast('Image too large! Max 5MB allowed.', 'error');
+      return;
+    }
+    
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setAvatar(reader.result);
+      showToast('Photo uploaded! Click "Save" to apply.', 'success');
+    };
+    reader.readAsDataURL(file);
+  };
+
   const handleUpdateProfile = (e) => {
     e.preventDefault();
-    // Simulate updating profile in context
-    currentUser.name = name;
-    currentUser.avatar = avatar;
-    localStorage.setItem('currentUser', JSON.stringify(currentUser));
-    showToast('Profile updated successfully!', 'success');
+    // Use the proper context function to update user through React state
+    updateUser({ name, avatar });
   };
 
   // Filter orders for logged-in buyer
@@ -134,20 +158,101 @@ export default function BuyerProfile() {
                 </div>
 
                 <div className="form-group">
-                  <label className="form-label">Avatar Image URL</label>
-                  <input 
-                    type="text" 
-                    value={avatar} 
-                    onChange={(e) => setAvatar(e.target.value)}
-                    className="form-control"
-                  />
-                  <div className="avatar-preview-row">
-                    <span>Preview:</span>
-                    <img src={avatar} alt="" className="avatar-preview-img" />
+                  <label className="form-label">Profile Photo</label>
+                  
+                  {/* Avatar upload area */}
+                  <div className="avatar-upload-area" style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '20px',
+                    padding: '16px',
+                    background: 'var(--bg-app)',
+                    borderRadius: '12px',
+                    border: '2px dashed var(--border-color)',
+                    marginBottom: '10px'
+                  }}>
+                    {/* Avatar preview with camera overlay */}
+                    <div style={{ position: 'relative' }}>
+                      <img 
+                        src={avatar} 
+                        alt="" 
+                        style={{
+                          width: '80px',
+                          height: '80px',
+                          borderRadius: '50%',
+                          objectFit: 'cover',
+                          border: '3px solid var(--primary)'
+                        }}
+                      />
+                      <label style={{
+                        position: 'absolute',
+                        bottom: '-2px',
+                        right: '-2px',
+                        background: 'var(--primary)',
+                        color: 'white',
+                        width: '28px',
+                        height: '28px',
+                        borderRadius: '50%',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        cursor: 'pointer',
+                        boxShadow: 'var(--shadow-sm)',
+                        transition: 'transform 0.2s ease'
+                      }}>
+                        <Camera size={14} />
+                        <input 
+                          type="file" 
+                          accept="image/*"
+                          style={{ display: 'none' }}
+                          onChange={handleAvatarFileUpload}
+                        />
+                      </label>
+                    </div>
+                    
+                    <div style={{ flex: 1 }}>
+                      <p style={{ fontWeight: 600, marginBottom: '4px', fontSize: '0.95rem' }}>
+                        Upload from device
+                      </p>
+                      <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: '10px' }}>
+                        Supports PNG, JPG, JPEG — Max 5MB
+                      </p>
+                      <label className="btn btn-secondary" style={{ 
+                        display: 'inline-flex', 
+                        alignItems: 'center', 
+                        gap: '6px',
+                        cursor: 'pointer', 
+                        margin: 0, 
+                        padding: '6px 16px', 
+                        fontSize: '0.8rem'
+                      }}>
+                        📂 Choose Photo
+                        <input 
+                          type="file" 
+                          accept="image/*"
+                          style={{ display: 'none' }}
+                          onChange={handleAvatarFileUpload}
+                        />
+                      </label>
+                    </div>
+                  </div>
+
+                  {/* Optional URL input fallback */}
+                  <div style={{ marginTop: '8px' }}>
+                    <label className="form-label" style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>
+                      Or paste an image URL
+                    </label>
+                    <input 
+                      type="text" 
+                      value={avatar} 
+                      onChange={(e) => setAvatar(e.target.value)}
+                      className="form-control"
+                      placeholder="https://example.com/my-photo.jpg"
+                    />
                   </div>
                 </div>
 
-                <button type="submit" className="btn btn-primary">Save Profile Changes</button>
+                <button type="submit" className="btn btn-primary" style={{ marginTop: '10px' }}>Save Profile Changes</button>
               </form>
             </div>
           )}

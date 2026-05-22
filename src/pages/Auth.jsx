@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useMarketplace } from '../context/MarketplaceContext';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { KeyRound, Mail, User, Store, ArrowRight, Sparkles } from 'lucide-react';
+import { KeyRound, Mail, User, Store, ArrowRight, Sparkles, ShoppingBag, AlertCircle } from 'lucide-react';
 
 export default function Auth() {
   const { login, signup, loginWithGoogle, mockForgotPassword, currentUser } = useMarketplace();
@@ -114,14 +114,24 @@ export default function Auth() {
               className={`role-tab ${role === 'buyer' ? 'active' : ''}`}
               onClick={() => setRole('buyer')}
             >
-              Buyer Portal
+              <ShoppingBag size={15} /> Buyer Portal
             </button>
             <button 
               className={`role-tab ${role === 'seller' ? 'active' : ''}`}
               onClick={() => setRole('seller')}
             >
-              Seller Hub
+              <Store size={15} /> Seller Hub
             </button>
+          </div>
+
+          {/* Role separation notice */}
+          <div className="role-notice">
+            <AlertCircle size={14} />
+            <span>
+              {role === 'buyer'
+                ? 'Buyer accounts can shop, wishlist & track orders. Sellers must log in via Seller Hub.'
+                : 'Seller accounts manage shops & products. Buyers must log in via Buyer Portal.'}
+            </span>
           </div>
 
           <div className="auth-header-text">
@@ -264,11 +274,14 @@ export default function Auth() {
             </button>
           </p>
 
-          <div style={{ marginTop: '20px', textAlign: 'center', fontSize: '0.8rem', color: 'var(--text-muted)' }}>
-            <strong>Demo Credentials:</strong><br />
-            Buyer: <code>buyer@happy.com</code> / password<br />
-            Seller: <code>seller@happy.com</code> / password<br />
-            Admin: <code>admin@happy.com</code> / password
+          <div style={{ marginTop: '20px', textAlign: 'center', fontSize: '0.8rem', color: 'var(--text-muted)', background: 'var(--bg-app)', borderRadius: '10px', padding: '14px 16px', border: '1px solid var(--border-color)' }}>
+            <strong style={{ display: 'block', marginBottom: '8px', color: 'var(--text-primary)' }}>🔑 Demo Credentials</strong>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px' }}>
+              <span>🛍️ Buyer: <code>buyer@happy.com</code> / <code>password</code></span>
+              <span>🏪 Seller: <code>seller@happy.com</code> / <code>password</code></span>
+              <span>🛡️ Admin: <code>admin@happy.com</code> / <code>password</code></span>
+            </div>
+            <p style={{ marginTop: '8px', fontSize: '0.75rem', color: 'var(--text-muted)' }}>⚠️ Buyer & Seller accounts are separate — select the correct portal above.</p>
           </div>
         </div>
 
@@ -369,6 +382,27 @@ export default function Auth() {
           cursor: pointer;
           border-radius: var(--border-radius-sm);
           transition: all var(--transition-fast);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+        }
+        .role-notice {
+          display: flex;
+          align-items: flex-start;
+          gap: 8px;
+          background: var(--primary-light);
+          border: 1px solid var(--primary);
+          border-radius: 8px;
+          padding: 10px 14px;
+          margin-bottom: 20px;
+          font-size: 0.78rem;
+          color: var(--primary);
+          line-height: 1.5;
+        }
+        .role-notice svg {
+          flex-shrink: 0;
+          margin-top: 2px;
         }
         .role-tab.active {
           background: var(--primary);

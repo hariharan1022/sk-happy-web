@@ -34,7 +34,7 @@ export default function SellerDashboard() {
   const [prodStatus, setProdStatus] = useState('In Stock');
   const [prodCategory, setProdCategory] = useState('T-Shirts');
   const [prodSubcat, setProdSubcat] = useState('');
-  const [prodImages, setProdImages] = useState('');
+  const [prodImages, setProdImages] = useState([]);
   const [prodVideo, setProdVideo] = useState('');
   const [prodSizes, setProdSizes] = useState('');
   const [prodColors, setProdColors] = useState('');
@@ -183,7 +183,7 @@ export default function SellerDashboard() {
     setProdStatus('In Stock');
     setProdCategory('T-Shirts');
     setProdSubcat('');
-    setProdImages('https://images.unsplash.com/photo-1559251606-c623743a6d76?w=600&auto=format&fit=crop&q=80');
+    setProdImages(['https://images.unsplash.com/photo-1559251606-c623743a6d76?w=600&auto=format&fit=crop&q=80']);
     setProdVideo('');
     setProdSizes('S, M, L');
     setProdColors('Red, Black');
@@ -223,7 +223,7 @@ export default function SellerDashboard() {
     setProdStatus(product.status || 'In Stock');
     setProdCategory(product.category || 'T-Shirts');
     setProdSubcat(product.subcategory || '');
-    setProdImages(product.images ? product.images.join(', ') : '');
+    setProdImages(product.images || []);
     setProdVideo(product.video || '');
     setProdSizes(product.sizes ? product.sizes.join(', ') : '');
     setProdColors(product.colors ? product.colors.join(', ') : '');
@@ -335,7 +335,7 @@ export default function SellerDashboard() {
 
   const handleProductSubmit = (e) => {
     e.preventDefault();
-    const imagesArray = prodImages.split(',').map(img => img.trim()).filter(img => img !== '');
+    const imagesArray = Array.isArray(prodImages) ? prodImages.filter(Boolean) : [];
     const sizesArray = prodSizes.split(',').map(s => s.trim()).filter(s => s !== '');
     const colorsArray = prodColors.split(',').map(c => c.trim()).filter(c => c !== '');
     const tagsArray = prodTags.split(',').map(t => t.trim()).filter(t => t !== '');
@@ -543,8 +543,7 @@ export default function SellerDashboard() {
                       });
                     });
                     Promise.all(promises).then(newImages => {
-                      const currentImages = prodImages ? prodImages.split(',').map(i => i.trim()).filter(Boolean) : [];
-                      setProdImages([...currentImages, ...newImages].join(', '));
+                      setProdImages(prev => [...prev, ...newImages]);
                       showToast(`Added ${newImages.length} photos successfully!`, 'success');
                     });
                   }}
@@ -579,8 +578,7 @@ export default function SellerDashboard() {
                           });
                         });
                         Promise.all(promises).then(newImages => {
-                          const currentImages = prodImages ? prodImages.split(',').map(i => i.trim()).filter(Boolean) : [];
-                          setProdImages([...currentImages, ...newImages].join(', '));
+                          setProdImages(prev => [...prev, ...newImages]);
                           showToast(`Uploaded ${newImages.length} images!`, 'success');
                         });
                       }}
@@ -589,36 +587,85 @@ export default function SellerDashboard() {
                 </div>
               </div>
 
+              {/* URL Import */}
               <div className="form-group">
-                <label className="form-label">Product Image URLs (Comma Separated)</label>
-                <textarea 
-                  placeholder="Paste cover URL and additional photo URLs separated by commas..."
-                  value={prodImages} 
-                  onChange={(e) => setProdImages(e.target.value)}
-                  className="form-control"
-                  rows={3}
-                  required
-                />
+                <label className="form-label">Add Product Image by URL</label>
+                <div style={{ display: 'flex', gap: '10px' }}>
+                  <input 
+                    type="text" 
+                    id="newImageUrlField"
+                    placeholder="Paste single image link here (e.g., https://...)..." 
+                    className="form-control"
+                    style={{ flex: 1 }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const val = e.target.value.trim();
+                        if (val) {
+                          setProdImages(prev => [...prev, val]);
+                          e.target.value = '';
+                          showToast('Image URL added!', 'success');
+                        }
+                      }
+                    }}
+                  />
+                  <button 
+                    type="button" 
+                    className="btn btn-secondary"
+                    style={{ margin: 0, whiteSpace: 'nowrap' }}
+                    onClick={() => {
+                      const input = document.getElementById('newImageUrlField');
+                      const val = input.value.trim();
+                      if (val) {
+                        setProdImages(prev => [...prev, val]);
+                        input.value = '';
+                        showToast('Image URL added!', 'success');
+                      }
+                    }}
+                  >
+                    Add URL
+                  </button>
+                </div>
               </div>
 
               {/* Gallery Preview Box */}
-              {prodImages.split(',').map(i => i.trim()).filter(Boolean).length > 0 && (
+              {prodImages.length > 0 && (
                 <div className="form-group">
-                  <label className="form-label">Image Gallery Preview ({prodImages.split(',').map(i => i.trim()).filter(Boolean).length} items)</label>
-                  <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap', marginTop: '5px' }}>
-                    {prodImages.split(',').map(i => i.trim()).filter(Boolean).map((img, idx) => (
-                      <div key={idx} style={{ position: 'relative', width: '70px', height: '70px', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--border-color)' }}>
+                  <label className="form-label">Image Gallery Preview ({prodImages.length} items)</label>
+                  <div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap', marginTop: '5px' }}>
+                    {prodImages.map((img, idx) => (
+                      <div 
+                        key={idx} 
+                        style={{ 
+                          position: 'relative', 
+                          width: '80px', 
+                          height: '80px', 
+                          borderRadius: '10px', 
+                          overflow: 'hidden', 
+                          border: '2px solid ' + (idx === 0 ? 'var(--primary)' : 'var(--border-color)'),
+                          boxShadow: 'var(--shadow-sm)',
+                          transition: 'all var(--transition-fast)'
+                        }}
+                      >
                         <img src={img} alt="" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                        {idx === 0 && (
+                          <span style={{ 
+                            position: 'absolute', bottom: 0, left: 0, right: 0, 
+                            background: 'var(--primary)', color: 'white', fontSize: '9px', 
+                            textAlign: 'center', fontWeight: 'bold', padding: '2px 0' 
+                          }}>
+                            Cover
+                          </span>
+                        )}
                         <button 
                           type="button" 
                           onClick={() => {
-                            const remaining = prodImages.split(',').map(i => i.trim()).filter(Boolean).filter((_, index) => index !== idx);
-                            setProdImages(remaining.join(', '));
+                            setProdImages(prodImages.filter((_, index) => index !== idx));
                           }} 
                           style={{
-                            position: 'absolute', top: '2px', right: '2px', background: 'rgba(239, 68, 68, 0.85)', color: 'white',
-                            border: 'none', borderRadius: '50%', width: '16px', height: '16px', fontSize: '10px', cursor: 'pointer',
-                            display: 'flex', alignItems: 'center', justifyContent: 'center'
+                            position: 'absolute', top: '4px', right: '4px', background: 'rgba(239, 68, 68, 0.9)', color: 'white',
+                            border: 'none', borderRadius: '50%', width: '18px', height: '18px', fontSize: '11px', cursor: 'pointer',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
                           }}
                         >
                           ×
