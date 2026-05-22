@@ -39,23 +39,27 @@ export default function Footer() {
           </div>
         </div>
 
-        {/* Links Column */}
+        {/* Shop Categories Column */}
         <div className="footer-col">
-          <h4 className="footer-title">About & Help</h4>
+          <h4 className="footer-title">Shop Categories</h4>
           <ul className="footer-links-list">
-            <li><Link to="/about">About Us</Link></li>
-            <li><Link to="/about#contact">Contact Us</Link></li>
-            <li><Link to="/about#faq">FAQ Help</Link></li>
+            <li><Link to="/tshirts">👕 T-Shirts</Link></li>
+            <li><Link to="/gifts">🎁 Gifts</Link></li>
+            <li><Link to="/birthday-kits">🎂 Birthday Kits</Link></li>
+            <li><Link to="/posters">🖼️ Posters</Link></li>
+            <li><Link to="/categories">All Categories</Link></li>
           </ul>
         </div>
 
-        {/* Policies Column */}
+        {/* Help & Policies Column */}
         <div className="footer-col">
-          <h4 className="footer-title">Policies & Media</h4>
+          <h4 className="footer-title">Help & Info</h4>
           <ul className="footer-links-list">
-            <li><a href="#privacy" onClick={(e) => { e.preventDefault(); showToast('🌸 Privacy Policy is set to standard adorable marketplace guidelines.', 'success'); }}>Privacy Policy</a></li>
-            <li><a href="#terms" onClick={(e) => { e.preventDefault(); showToast('🌸 Terms of Service are activated under cute shopping protections.', 'success'); }}>Terms</a></li>
-            <li><a href="https://instagram.com" target="_blank" rel="noreferrer">Social Media</a></li>
+            <li><Link to="/about">About Us</Link></li>
+            <li><Link to="/contact">Contact Us</Link></li>
+            <li><Link to="/policy">Shipping Policy</Link></li>
+            <li><Link to="/policy">Returns & Refunds</Link></li>
+            <li><Link to="/policy">Privacy Policy</Link></li>
           </ul>
         </div>
 
@@ -100,7 +104,7 @@ export default function Footer() {
         }
         .footer-grid {
           display: grid;
-          grid-template-columns: 2fr 1fr 1fr 2fr;
+          grid-template-columns: 1.8fr 1fr 1fr 1.5fr;
           gap: 40px;
           margin-bottom: 50px;
         }

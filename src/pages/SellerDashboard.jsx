@@ -168,87 +168,13 @@ export default function SellerDashboard() {
     });
   };
 
-  // 6. Product Add/Edit Operations
+  // 6. Product Add/Edit Navigation (now routes to standalone pages)
   const openAddProductModal = () => {
-    setEditingProductId(null);
-    setProdName('');
-    setProdShortDesc('');
-    setProdDesc('');
-    setProdPrice('');
-    setProdSalePrice('');
-    setProdDiscount('0');
-    setProdCurrency('$');
-    setProdStock('');
-    setProdSku('');
-    setProdStatus('In Stock');
-    setProdCategory('T-Shirts');
-    setProdSubcat('');
-    setProdImages(['https://images.unsplash.com/photo-1559251606-c623743a6d76?w=600&auto=format&fit=crop&q=80']);
-    setProdVideo('');
-    setProdSizes('S, M, L');
-    setProdColors('Red, Black');
-    setProdTags('cute, handmade, plushie');
-    setProdDelivery('Ships in 1-2 business days.');
-    setProdReturn('Returns accepted within 7 days.');
-    setProdWeight('0.5 kg');
-    setProdDimensions('20cm x 15cm x 10cm');
-    setProdShippingCost('5.00');
-    setProdShippingCountries('Worldwide');
-    setProdMetaTitle('');
-    setProdMetaDesc('');
-    setProdSlug('');
-    setHasVariants(false);
-    setProdVariants([]);
-    setFormSection('basic');
-    setShowProductModal(true);
+    navigate('/add-product');
   };
 
   const openEditProductModal = (product) => {
-    setEditingProductId(product.id);
-    setProdName(product.name);
-    setProdShortDesc(product.shortDescription || '');
-    setProdDesc(product.description || '');
-    setProdPrice(product.price || '');
-    setProdDiscount(product.discount !== undefined ? product.discount : '0');
-    
-    // Set Sale Price
-    const original = Number(product.price) || 0;
-    const discount = Number(product.discount) || 0;
-    const sale = discount > 0 ? original * (1 - discount / 100) : original;
-    setProdSalePrice(sale.toFixed(2));
-    
-    setProdCurrency(product.currency || '$');
-    setProdStock(product.stock || '');
-    setProdSku(product.sku || '');
-    setProdStatus(product.status || 'In Stock');
-    setProdCategory(product.category || 'T-Shirts');
-    setProdSubcat(product.subcategory || '');
-    setProdImages(product.images || []);
-    setProdVideo(product.video || '');
-    setProdSizes(product.sizes ? product.sizes.join(', ') : '');
-    setProdColors(product.colors ? product.colors.join(', ') : '');
-    setProdTags(product.tags ? product.tags.join(', ') : '');
-    setProdDelivery(product.deliveryDetails || '');
-    setProdReturn(product.returnPolicy || '');
-    
-    // New Shipping
-    setProdWeight(product.weight || '');
-    setProdDimensions(product.dimensions || '');
-    setProdShippingCost(product.shippingCost !== undefined ? product.shippingCost.toString() : '');
-    setProdShippingCountries(product.shippingCountries || 'Worldwide');
-    
-    // SEO
-    setProdMetaTitle(product.metaTitle || '');
-    setProdMetaDesc(product.metaDescription || '');
-    setProdSlug(product.slug || '');
-    
-    // Variants
-    const hasVars = product.variants && product.variants.length > 0;
-    setHasVariants(hasVars);
-    setProdVariants(product.variants || []);
-    
-    setFormSection('basic');
-    setShowProductModal(true);
+    navigate(`/edit-product/${product.id}`);
   };
 
   // Pricing Interactions
@@ -1389,19 +1315,18 @@ export default function SellerDashboard() {
             </div>
           )}
 
-          {/* TAB 2: ADD PRODUCT */}
+          {/* TAB 2: ADD PRODUCT - redirects to standalone page */}
           {activeTab === 'add-product' && (
-            <div className="card tab-pane-card animate-fade">
-              <h3>Add New Product Listing</h3>
-              <p className="subtitle">List a cute new item in your store catalog</p>
-              <hr className="divider" style={{ margin: '15px 0' }} />
- 
-              <form onSubmit={handleProductSubmit} className="modal-product-form">
-                {renderProductFormFields()}
-                <div style={{ marginTop: '25px', display: 'flex', justifyContent: 'flex-end' }}>
-                  <button type="submit" className="btn btn-primary" style={{ width: '200px' }}>Create Listing</button>
-                </div>
-              </form>
+            <div className="card tab-pane-card animate-fade" style={{ textAlign: 'center', padding: '60px 30px' }}>
+              <span style={{ fontSize: '4rem', display: 'block', marginBottom: '20px' }}>✨</span>
+              <h3 style={{ marginBottom: '10px' }}>Create a New Listing</h3>
+              <p style={{ color: 'var(--text-secondary)', marginBottom: '30px', maxWidth: '400px', margin: '0 auto 30px' }}>
+                Our full-featured listing workspace helps you add photos, variants, shipping specs, SEO tags, and more.
+              </p>
+              <button onClick={() => navigate('/add-product')} className="btn btn-primary" style={{ padding: '14px 36px', fontSize: '1rem', borderRadius: '30px' }}>
+                <Plus size={18} style={{ marginRight: '8px', display: 'inline', verticalAlign: 'middle' }} />
+                Open Listing Workspace
+              </button>
             </div>
           )}
 
@@ -1413,7 +1338,7 @@ export default function SellerDashboard() {
                   <h3>Manage Products</h3>
                   <p className="subtitle">Adjust pricing, stock volume, and catalog status</p>
                 </div>
-                <button onClick={() => { openAddProductModal(); setActiveTab('add-product'); }} className="btn btn-primary">
+                <button onClick={() => navigate('/add-product')} className="btn btn-primary">
                   <Plus size={16} /> Add Product
                 </button>
               </div>
@@ -1461,7 +1386,7 @@ export default function SellerDashboard() {
                           <td>⭐ {prod.rating}</td>
                           <td>
                             <div className="table-actions-row">
-                              <button onClick={() => openEditProductModal(prod)} className="table-act-btn edit" aria-label="Edit product">
+                              <button onClick={() => navigate(`/edit-product/${prod.id}`)} className="table-act-btn edit" aria-label="Edit product">
                                 <Edit size={14} />
                               </button>
                               <button onClick={() => toggleHideProduct(prod.id)} className="table-act-btn hide" aria-label={prod.hidden ? 'Unhide product' : 'Hide product'}>
@@ -1808,26 +1733,7 @@ export default function SellerDashboard() {
 
       </div>
 
-      {/* Add / Edit Product Modal */}
-      {showProductModal && (
-        <div className="modal-overlay">
-          <div className="modal-content card animate-fade" style={{ maxWidth: '750px', width: '90%' }}>
-            <h3>{editingProductId ? 'Edit Product Details' : 'Add New Product Listing'}</h3>
-            <hr className="divider" style={{ margin: '12px 0' }} />
-
-            <form onSubmit={handleProductSubmit} className="modal-product-form">
-              <div className="grid-scroll-box" style={{ maxHeight: '70vh', overflowY: 'auto', paddingRight: '5px' }}>
-                {renderProductFormFields()}
-              </div>
-
-              <div className="modal-actions-row" style={{ marginTop: '20px', display: 'flex', gap: '10px', justifyContent: 'flex-end' }}>
-                <button type="button" onClick={() => setShowProductModal(false)} className="btn btn-outline">Cancel</button>
-                <button type="submit" className="btn btn-secondary">Save Listing</button>
-              </div>
-            </form>
-          </div>
-        </div>
-      )}
+      {/* Product modal removed - now handled by standalone /add-product and /edit-product/:id pages */}
 
       <style dangerouslySetInnerHTML={{__html: `
         .seller-dashboard-container {

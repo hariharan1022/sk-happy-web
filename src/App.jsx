@@ -3,6 +3,7 @@ import { HashRouter as Router, Routes, Route, Navigate } from 'react-router-dom'
 import { MarketplaceProvider, useMarketplace } from './context/MarketplaceContext';
 import Navbar from './components/Navbar';
 import Footer from './components/Footer';
+import OpeningLoader from './components/OpeningLoader';
 import Home from './pages/Home';
 import About from './pages/About';
 import Auth from './pages/Auth';
@@ -19,6 +20,13 @@ import Shops from './pages/Shops';
 import Offers from './pages/Offers';
 import BestSellers from './pages/BestSellers';
 import Orders from './pages/Orders';
+import Tshirts from './pages/Tshirts';
+import Gifts from './pages/Gifts';
+import BirthdayKits from './pages/BirthdayKits';
+import Posters from './pages/Posters';
+import Policy from './pages/Policy';
+import Contact from './pages/Contact';
+import AddProduct from './pages/AddProduct';
 
 // Guard: Only sellers can access this route
 function SellerRoute({ children }) {
@@ -103,6 +111,7 @@ function AdminRoute({ children }) {
 export default function App() {
   return (
     <MarketplaceProvider>
+      <OpeningLoader />
       <Router>
         <div className="app-container">
           <Navbar />
@@ -119,11 +128,19 @@ export default function App() {
               <Route path="/seller-dashboard" element={<SellerRoute><SellerDashboard /></SellerRoute>} />
               <Route path="/admin" element={<AdminRoute><AdminPanel /></AdminRoute>} />
               <Route path="/categories" element={<Categories />} />
-              <Route path="/trending" element={<Trending />} />
+              <Route style={{ contentVisibility: 'auto' }} path="/trending" element={<Trending />} />
               <Route path="/shops" element={<Shops />} />
               <Route path="/offers" element={<Offers />} />
               <Route path="/best-sellers" element={<BestSellers />} />
               <Route path="/orders" element={<Orders />} />
+              <Route path="/tshirts" element={<Tshirts />} />
+              <Route path="/gifts" element={<Gifts />} />
+              <Route path="/birthday-kits" element={<BirthdayKits />} />
+              <Route path="/posters" element={<Posters />} />
+              <Route path="/policy" element={<Policy />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/add-product" element={<SellerRoute><AddProduct /></SellerRoute>} />
+              <Route path="/edit-product/:productId" element={<SellerRoute><AddProduct /></SellerRoute>} />
             </Routes>
           </main>
           <Footer />

@@ -6,6 +6,7 @@ import {
   Search, SlidersHorizontal, ArrowRight, Star, Heart, 
   ShoppingBag, Sparkles, Percent, Eye, ChevronLeft, ChevronRight 
 } from 'lucide-react';
+import ProductCard from '../components/ProductCard';
 
 const BANNER_SLIDES = [
   {
@@ -157,22 +158,133 @@ export default function Home() {
       <section className="hero-section container">
         <div className="hero-content-wrapper">
           <div className="hero-text-block">
-            <span className="hero-badge badge badge-primary"><Sparkles size={14} /> Cute & Premium Marketplace</span>
-            <h1>Where Happy Little Crafts Find Happy Homes</h1>
-            <p>Discover kawaii stationery, fuzzy handmade plushies, aesthetic tea mugs, and sweet accessories from small independent shops.</p>
-            <div className="hero-cta-buttons">
-              <a href="#products-grid-anchor" className="btn btn-primary btn-lg">Shop Cute Things <ArrowRight size={18} /></a>
-              <Link to="/auth?mode=signup&role=seller" className="btn btn-outline btn-lg">Open Your Shop</Link>
+            <div className="hero-badge-row" style={{ display: 'flex', gap: '8px', marginBottom: '14px', flexWrap: 'wrap' }}>
+              <span className="hero-badge badge badge-primary" style={{ margin: 0 }}><Sparkles size={14} /> Premium Artisan Collection</span>
+              <span className="hero-badge badge badge-secondary" style={{ margin: 0, background: 'var(--secondary-light)', color: 'var(--secondary)', border: '1px solid var(--secondary)' }}>🚚 Free Worldwide Shipping</span>
+            </div>
+            <h1 style={{ fontSize: '3.6rem', lineHeight: '1.15', fontWeight: '800', marginBottom: '20px' }}>
+              Handcrafted Joy, <br />
+              <span style={{ background: 'linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent' }}>Made Just For You.</span>
+            </h1>
+            <p style={{ fontSize: '1.15rem', color: 'var(--text-secondary)', lineHeight: '1.65', marginBottom: '25px', maxWidth: '580px' }}>
+              Discover professional custom graphic t-shirts, deluxe birthday kit sets, inspirational posters, and personalized gifts made with love by independent creators.
+            </p>
+            
+            {/* Elegant Search bar within Hero */}
+            <form onSubmit={handleSearchSubmit} className="hero-search-box" style={{ marginBottom: '20px', maxWidth: '480px' }}>
+              <div className="search-input-wrapper" style={{ position: 'relative', width: '100%' }}>
+                <input 
+                  type="text" 
+                  placeholder="Search custom graphic tees, birthday kits, hampers..." 
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="search-input"
+                  style={{
+                    width: '100%',
+                    padding: '14px 50px 14px 20px',
+                    borderRadius: '50px',
+                    border: '2px solid var(--border-color)',
+                    background: 'var(--bg-card)',
+                    color: 'var(--text-primary)',
+                    outline: 'none',
+                    fontSize: '0.95rem',
+                    transition: 'all 0.3s ease',
+                    boxShadow: 'var(--shadow-sm)'
+                  }}
+                />
+                <button type="submit" className="search-btn" style={{
+                  position: 'absolute',
+                  right: '6px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  background: 'var(--primary)',
+                  border: 'none',
+                  color: 'white',
+                  width: '40px',
+                  height: '40px',
+                  borderRadius: '50%',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContext: 'center',
+                  cursor: 'pointer',
+                  transition: 'background 0.2s'
+                }}>
+                  <Search size={18} style={{ margin: 'auto' }} />
+                </button>
+              </div>
+            </form>
+
+            <div className="hero-quick-links" style={{ display: 'flex', gap: '8px', alignItems: 'center', fontSize: '0.85rem', marginBottom: '30px', flexWrap: 'wrap' }}>
+              <span style={{ color: 'var(--text-muted)', fontWeight: '700' }}>Quick Tags:</span>
+              <Link to="/tshirts" className="quick-link" style={{ textDecoration: 'none', background: 'var(--primary-light)', color: 'var(--primary)', padding: '4px 12px', borderRadius: '20px', fontWeight: '700', transition: 'all 0.2s' }}>T-Shirts</Link>
+              <Link to="/birthday-kits" className="quick-link" style={{ textDecoration: 'none', background: 'var(--primary-light)', color: 'var(--primary)', padding: '4px 12px', borderRadius: '20px', fontWeight: '700', transition: 'all 0.2s' }}>Birthday Kits</Link>
+              <Link to="/posters" className="quick-link" style={{ textDecoration: 'none', background: 'var(--primary-light)', color: 'var(--primary)', padding: '4px 12px', borderRadius: '20px', fontWeight: '700', transition: 'all 0.2s' }}>Posters</Link>
+              <Link to="/gifts" className="quick-link" style={{ textDecoration: 'none', background: 'var(--primary-light)', color: 'var(--primary)', padding: '4px 12px', borderRadius: '20px', fontWeight: '700', transition: 'all 0.2s' }}>Gifts</Link>
+            </div>
+
+            <div className="hero-cta-buttons" style={{ display: 'flex', gap: '15px', marginBottom: '35px' }}>
+              <a href="#category-spotlights" className="btn btn-primary btn-lg" style={{ padding: '14px 30px', borderRadius: '30px', fontWeight: '700', display: 'flex', alignItems: 'center', gap: '8px' }}>Explore Showcases <ArrowRight size={18} /></a>
+              <Link to="/auth?mode=signup&role=seller" className="btn btn-outline btn-lg" style={{ padding: '14px 30px', borderRadius: '30px', fontWeight: '700' }}>Open Maker Shop</Link>
+            </div>
+
+            {/* Glowing stats overlay in hero */}
+            <div className="hero-stats-bar" style={{ display: 'flex', gap: '24px', alignItems: 'center', borderTop: '1px solid var(--border-color)', paddingTop: '24px', flexWrap: 'wrap' }}>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <strong style={{ fontSize: '1.5rem', fontWeight: '800', color: 'var(--primary)', fontFamily: 'var(--font-heading)' }}>15k+</strong>
+                <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase' }}>Cute Orders</span>
+              </div>
+              <div style={{ height: '30px', width: '1px', background: 'var(--border-color)' }} />
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <strong style={{ fontSize: '1.5rem', fontWeight: '800', color: 'var(--secondary)', fontFamily: 'var(--font-heading)' }}>4.9★</strong>
+                <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase' }}>Shop Rating</span>
+              </div>
+              <div style={{ height: '30px', width: '1px', background: 'var(--border-color)' }} />
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <strong style={{ fontSize: '1.5rem', fontWeight: '800', color: '#10B981', fontFamily: 'var(--font-heading)' }}>100%</strong>
+                <span style={{ fontSize: '0.78rem', color: 'var(--text-muted)', fontWeight: '700', textTransform: 'uppercase' }}>Maker Verified</span>
+              </div>
             </div>
           </div>
-          <div className="hero-art-block">
-            <div className="glass-bubble bounce">🐰</div>
-            <div className="glass-bubble bubble-purple bounce" style={{ animationDelay: '0.5s' }}>🧁</div>
-            <div className="glass-bubble bubble-mint bounce" style={{ animationDelay: '1s' }}>🌸</div>
-            <img src="https://images.unsplash.com/photo-1559251606-c623743a6d76?w=600&auto=format&fit=crop&q=80" alt="Plushies" className="hero-main-img" />
+
+          <div className="hero-art-block" style={{ position: 'relative' }}>
+            {/* Overlapping premium dynamic image grid */}
+            <div className="hero-image-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gridTemplateRows: 'repeat(6, 1fr)', gap: '12px', height: '420px', width: '100%' }}>
+              <div className="hero-grid-item item-large" style={{ gridColumn: '1/4', gridRow: '1/5', position: 'relative', borderRadius: '16px', overflow: 'hidden', border: '4px solid var(--bg-card)', boxShadow: 'var(--shadow-md)', transition: 'all 0.3s' }}>
+                <img src="https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=500&auto=format&fit=crop&q=80" alt="Printed Tees" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <span style={{ position: 'absolute', bottom: '10px', left: '10px', background: 'rgba(255,255,255,0.85)', color: 'var(--text-primary)', padding: '3px 10px', borderRadius: '20px', fontSize: '0.72rem', fontWeight: '800', backdropFilter: 'blur(4px)' }}>T-Shirts</span>
+              </div>
+              <div className="hero-grid-item item-medium" style={{ gridColumn: '4/7', gridRow: '1/4', position: 'relative', borderRadius: '16px', overflow: 'hidden', border: '4px solid var(--bg-card)', boxShadow: 'var(--shadow-md)', transition: 'all 0.3s' }}>
+                <img src="https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=500&auto=format&fit=crop&q=80" alt="Birthday Packs" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <span style={{ position: 'absolute', bottom: '10px', left: '10px', background: 'rgba(255,255,255,0.85)', color: 'var(--text-primary)', padding: '3px 10px', borderRadius: '20px', fontSize: '0.72rem', fontWeight: '800', backdropFilter: 'blur(4px)' }}>Birthday Kits</span>
+              </div>
+              <div className="hero-grid-item item-small" style={{ gridColumn: '1/3', gridRow: '5/7', position: 'relative', borderRadius: '16px', overflow: 'hidden', border: '4px solid var(--bg-card)', boxShadow: 'var(--shadow-md)', transition: 'all 0.3s' }}>
+                <img src="https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=500&auto=format&fit=crop&q=80" alt="Art Prints" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <span style={{ position: 'absolute', bottom: '10px', left: '10px', background: 'rgba(255,255,255,0.85)', color: 'var(--text-primary)', padding: '3px 10px', borderRadius: '20px', fontSize: '0.72rem', fontWeight: '800', backdropFilter: 'blur(4px)' }}>Posters</span>
+              </div>
+              <div className="hero-grid-item item-accent" style={{ gridColumn: '3/7', gridRow: '4/7', position: 'relative', borderRadius: '16px', overflow: 'hidden', border: '4px solid var(--bg-card)', boxShadow: 'var(--shadow-md)', transition: 'all 0.3s' }}>
+                <img src="https://images.unsplash.com/photo-1559251606-c623743a6d76?w=600&auto=format&fit=crop&q=80" alt="Gifts" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                <span style={{ position: 'absolute', bottom: '10px', left: '10px', background: 'rgba(255,255,255,0.85)', color: 'var(--text-primary)', padding: '3px 10px', borderRadius: '20px', fontSize: '0.72rem', fontWeight: '800', backdropFilter: 'blur(4px)' }}>Gifts</span>
+              </div>
+            </div>
+            
+            {/* Floating glass badge */}
+            <div className="floating-hero-badge" style={{
+              position: 'absolute', bottom: '20px', left: '-20px',
+              display: 'flex', gap: '10px', alignItems: 'center',
+              background: 'rgba(255, 255, 255, 0.9)', border: '1px solid var(--border-color)',
+              backdropFilter: 'blur(8px)', padding: '10px 18px', borderRadius: '14px',
+              boxShadow: 'var(--shadow-lg)', zIndex: 5
+            }}>
+              <span style={{ fontSize: '1.6rem' }}>🏆</span>
+              <div style={{ display: 'flex', flexDirection: 'column' }}>
+                <strong style={{ fontSize: '0.8rem', fontWeight: '800', color: 'var(--text-primary)' }}>100% Original</strong>
+                <span style={{ fontSize: '0.68rem', color: 'var(--text-secondary)', fontWeight: '600' }}>Certified Small Shops</span>
+              </div>
+            </div>
           </div>
         </div>
       </section>
+
 
       {/* 2. Banner Slider */}
       <section className="banner-slider-section container">
@@ -279,6 +391,93 @@ export default function Home() {
           </div>
         </section>
       )}
+
+      {/* Category Spotlights Showcases */}
+      <section id="category-spotlights" className="spotlights-section container" style={{ marginTop: '50px', marginBottom: '70px' }}>
+        <div className="section-header" style={{ marginBottom: '40px' }}>
+          <span className="badge badge-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', fontWeight: '700' }}>
+            <Sparkles size={12} /> Curated Collections
+          </span>
+          <h2 style={{ fontSize: '2.5rem', fontWeight: '800', marginTop: '10px' }}>Signature Spotlights</h2>
+          <p style={{ color: 'var(--text-secondary)' }}>Explore our popular shelves curated by verified artisans</p>
+        </div>
+
+        {/* 1. Tshirt Shelf */}
+        <div className="spotlight-shelf card" style={{ marginBottom: '40px', padding: '35px', background: 'linear-gradient(135deg, rgba(255, 227, 236, 0.25) 0%, rgba(241, 234, 255, 0.25) 100%)', border: '1px solid rgba(255,255,255,0.6)' }}>
+          <div className="shelf-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '15px', marginBottom: '25px' }}>
+            <div>
+              <span className="badge" style={{ background: 'var(--primary)', color: 'white', fontWeight: '700' }}>👕 Apparel Shelf</span>
+              <h3 style={{ margin: '8px 0 4px 0', fontSize: '1.6rem', fontWeight: '800', fontFamily: 'var(--font-heading)' }}>Graphic T-Shirts & Custom Prints</h3>
+              <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.95rem' }}>100% organic cotton graphic tees, embroidered caps, and sweet prints</p>
+            </div>
+            <Link to="/tshirts" className="btn btn-outline" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', margin: 0 }}>
+              Shop T-Shirts <ArrowRight size={14} />
+            </Link>
+          </div>
+          <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '25px' }}>
+            {products.filter(p => p.category === 'T-Shirts' && !p.hidden).slice(0, 4).map(prod => (
+              <ProductCard key={prod.id} product={prod} />
+            ))}
+          </div>
+        </div>
+
+        {/* 2. Birthday Kit Shelf */}
+        <div className="spotlight-shelf card" style={{ marginBottom: '40px', padding: '35px', background: 'linear-gradient(135deg, rgba(235, 253, 251, 0.25) 0%, rgba(255, 253, 245, 0.25) 100%)', border: '1px solid rgba(255,255,255,0.6)' }}>
+          <div className="shelf-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '15px', marginBottom: '25px' }}>
+            <div>
+              <span className="badge" style={{ background: 'var(--secondary)', color: 'white', fontWeight: '700' }}>🎂 Celebrations Shelf</span>
+              <h3 style={{ margin: '8px 0 4px 0', fontSize: '1.6rem', fontWeight: '800', fontFamily: 'var(--font-heading)' }}>Deluxe Birthday Kits & Bundles</h3>
+              <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.95rem' }}>Coordinated party themes, balloons, banners, hats, and cake toppers</p>
+            </div>
+            <Link to="/birthday-kits" className="btn btn-outline" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', margin: 0 }}>
+              Shop Birthday Kits <ArrowRight size={14} />
+            </Link>
+          </div>
+          <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '25px' }}>
+            {products.filter(p => p.category === 'Birthday Kit' && !p.hidden).slice(0, 4).map(prod => (
+              <ProductCard key={prod.id} product={prod} />
+            ))}
+          </div>
+        </div>
+
+        {/* 3. Posters Shelf */}
+        <div className="spotlight-shelf card" style={{ marginBottom: '40px', padding: '35px', background: 'linear-gradient(135deg, rgba(255, 232, 234, 0.25) 0%, rgba(255, 245, 246, 0.25) 100%)', border: '1px solid rgba(255,255,255,0.6)' }}>
+          <div className="shelf-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '15px', marginBottom: '25px' }}>
+            <div>
+              <span className="badge" style={{ background: '#FF758F', color: 'white', fontWeight: '700' }}>🖼️ Inspiration Shelf</span>
+              <h3 style={{ margin: '8px 0 4px 0', fontSize: '1.6rem', fontWeight: '800', fontFamily: 'var(--font-heading)' }}>Affirmation Wall Posters & Art</h3>
+              <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.95rem' }}>Heavyweight matte prints, positive quotes, and hand-drawn room decor</p>
+            </div>
+            <Link to="/posters" className="btn btn-outline" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', margin: 0 }}>
+              Shop Posters <ArrowRight size={14} />
+            </Link>
+          </div>
+          <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '25px' }}>
+            {products.filter(p => p.category === 'Posters' && !p.hidden).slice(0, 4).map(prod => (
+              <ProductCard key={prod.id} product={prod} />
+            ))}
+          </div>
+        </div>
+
+        {/* 4. Gifts Shelf */}
+        <div className="spotlight-shelf card" style={{ padding: '35px', background: 'linear-gradient(135deg, rgba(255, 240, 243, 0.25) 0%, rgba(245, 236, 255, 0.25) 100%)', border: '1px solid rgba(255,255,255,0.6)' }}>
+          <div className="shelf-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '15px', marginBottom: '25px' }}>
+            <div>
+              <span className="badge" style={{ background: '#8B5CF6', color: 'white', fontWeight: '700' }}>🎁 Joy Baskets Shelf</span>
+              <h3 style={{ margin: '8px 0 4px 0', fontSize: '1.6rem', fontWeight: '800', fontFamily: 'var(--font-heading)' }}>Curated Joy Gift Boxes & Sets</h3>
+              <p style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '0.95rem' }}>Daisy ceramic mugs, relaxation candles, plushies, and custom sets</p>
+            </div>
+            <Link to="/gifts" className="btn btn-outline" style={{ display: 'inline-flex', alignItems: 'center', gap: '6px', margin: 0 }}>
+              Shop Gift Sets <ArrowRight size={14} />
+            </Link>
+          </div>
+          <div className="grid-responsive" style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(260px, 1fr))', gap: '25px' }}>
+            {products.filter(p => p.category === 'Gifts' && !p.hidden).slice(0, 4).map(prod => (
+              <ProductCard key={prod.id} product={prod} />
+            ))}
+          </div>
+        </div>
+      </section>
 
       {/* 5. Trending / Product Catalog Anchor */}
       <div id="products-grid-anchor" />

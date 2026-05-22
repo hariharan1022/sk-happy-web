@@ -14,6 +14,7 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [profileDropdownOpen, setProfileDropdownOpen] = useState(false);
   const [notifDropdownOpen, setNotifDropdownOpen] = useState(false);
+  const [shopDropdownOpen, setShopDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
   const cartCount = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -141,6 +142,7 @@ export default function Navbar() {
                       {currentUser.role === 'seller' && (
                         <>
                           <li><Link to="/seller-dashboard" onClick={() => setProfileDropdownOpen(false)}><LayoutDashboard size={16} /> Seller Panel</Link></li>
+                          <li><Link to="/add-product" onClick={() => setProfileDropdownOpen(false)}><ShoppingBag size={16} /> Add Product</Link></li>
                           <li><Link to={currentUser.shopId ? `/shop/${currentUser.shopId}` : '/seller-dashboard'} onClick={() => setProfileDropdownOpen(false)}><ShoppingBag size={16} /> My Shop</Link></li>
                           <li><Link to="/chat" onClick={() => setProfileDropdownOpen(false)}><MessageSquare size={16} /> Buyer Chats</Link></li>
                         </>
@@ -168,17 +170,35 @@ export default function Navbar() {
           </div>
         </div>
 
-        {/* Row 2: Home | Categories | Trending | Shops | Offers / Deals | Best Sellers | My Orders */}
+        {/* Row 2: Main Nav Links */}
         <div className="nav-row-bottom">
           <div className="container bottom-nav-inner">
             <ul className="nav-links">
               <li><Link to="/">Home</Link></li>
-              <li><Link to="/categories">Categories</Link></li>
+              {/* Shop Categories Dropdown */}
+              <li
+                className="nav-dropdown-parent"
+                onMouseEnter={() => setShopDropdownOpen(true)}
+                onMouseLeave={() => setShopDropdownOpen(false)}
+              >
+                <span className="nav-dropdown-trigger">Shop ▾</span>
+                {shopDropdownOpen && (
+                  <div className="nav-category-dropdown card">
+                    <Link to="/tshirts" onClick={() => setShopDropdownOpen(false)}>👕 T-Shirts</Link>
+                    <Link to="/gifts" onClick={() => setShopDropdownOpen(false)}>🎁 Gifts</Link>
+                    <Link to="/birthday-kits" onClick={() => setShopDropdownOpen(false)}>🎂 Birthday Kits</Link>
+                    <Link to="/posters" onClick={() => setShopDropdownOpen(false)}>🖼️ Posters</Link>
+                    <hr style={{ border: 0, borderTop: '1px solid var(--border-color)', margin: '6px 0' }} />
+                    <Link to="/categories" onClick={() => setShopDropdownOpen(false)}>🗂️ All Categories</Link>
+                  </div>
+                )}
+              </li>
               <li><Link to="/trending">Trending</Link></li>
               <li><Link to="/shops">Shops</Link></li>
               <li><Link to="/offers">Offers / Deals</Link></li>
               <li><Link to="/best-sellers">Best Sellers</Link></li>
               <li><Link to="/orders">My Orders</Link></li>
+              <li><Link to="/contact">Contact</Link></li>
             </ul>
           </div>
         </div>
@@ -242,19 +262,26 @@ export default function Navbar() {
 
           <ul className="mobile-drawer-links">
             <li><Link to="/" onClick={() => setMobileMenuOpen(false)}>Home</Link></li>
-            <li><Link to="/categories" onClick={() => setMobileMenuOpen(false)}>Categories</Link></li>
+            <li style={{ fontWeight: '700', color: 'var(--text-muted)', fontSize: '0.75rem', textTransform: 'uppercase', letterSpacing: '0.05em', paddingBottom: '4px' }}>Shop Categories</li>
+            <li><Link to="/tshirts" onClick={() => setMobileMenuOpen(false)}>👕 T-Shirts</Link></li>
+            <li><Link to="/gifts" onClick={() => setMobileMenuOpen(false)}>🎁 Gifts</Link></li>
+            <li><Link to="/birthday-kits" onClick={() => setMobileMenuOpen(false)}>🎂 Birthday Kits</Link></li>
+            <li><Link to="/posters" onClick={() => setMobileMenuOpen(false)}>🖼️ Posters</Link></li>
+            <li><Link to="/categories" onClick={() => setMobileMenuOpen(false)}>🗂️ All Categories</Link></li>
             <li><Link to="/trending" onClick={() => setMobileMenuOpen(false)}>Trending</Link></li>
             <li><Link to="/shops" onClick={() => setMobileMenuOpen(false)}>Shops</Link></li>
             <li><Link to="/offers" onClick={() => setMobileMenuOpen(false)}>Offers / Deals</Link></li>
             <li><Link to="/best-sellers" onClick={() => setMobileMenuOpen(false)}>Best Sellers</Link></li>
             <li><Link to="/orders" onClick={() => setMobileMenuOpen(false)}>My Orders</Link></li>
             <li><Link to="/profile" onClick={() => setMobileMenuOpen(false)}>Profile</Link></li>
+            <li><Link to="/contact" onClick={() => setMobileMenuOpen(false)}>Contact Us</Link></li>
             
             <hr className="dropdown-divider" />
             
             {currentUser && currentUser.role === 'seller' && (
               <>
                 <li><Link to="/seller-dashboard" onClick={() => setMobileMenuOpen(false)}>Seller Dashboard</Link></li>
+                <li><Link to="/add-product" onClick={() => setMobileMenuOpen(false)}>➕ Add Product</Link></li>
                 <li><Link to="/chat" onClick={() => setMobileMenuOpen(false)}>Buyer Chats</Link></li>
               </>
             )}
@@ -406,8 +433,57 @@ export default function Navbar() {
           font-weight: 600;
           font-size: 0.95rem;
           color: var(--text-secondary);
+          align-items: center;
         }
         .nav-links a:hover {
+          color: var(--primary);
+        }
+        /* Shop dropdown */
+        .nav-dropdown-parent {
+          position: relative;
+          cursor: pointer;
+        }
+        .nav-dropdown-trigger {
+          color: var(--text-secondary);
+          font-family: var(--font-heading);
+          font-weight: 600;
+          font-size: 0.95rem;
+          user-select: none;
+          transition: color 0.2s;
+        }
+        .nav-dropdown-parent:hover .nav-dropdown-trigger {
+          color: var(--primary);
+        }
+        .nav-category-dropdown {
+          position: absolute;
+          top: calc(100% + 12px);
+          left: 50%;
+          transform: translateX(-50%);
+          min-width: 200px;
+          padding: 10px;
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          z-index: 1020;
+          box-shadow: var(--shadow-lg);
+          border-color: var(--border-hover);
+          animation: fadeInDown 0.15s ease;
+        }
+        @keyframes fadeInDown {
+          from { opacity: 0; transform: translateX(-50%) translateY(-8px); }
+          to { opacity: 1; transform: translateX(-50%) translateY(0); }
+        }
+        .nav-category-dropdown a {
+          display: block;
+          padding: 9px 14px;
+          border-radius: var(--border-radius-xs);
+          font-weight: 600;
+          font-size: 0.9rem;
+          color: var(--text-secondary);
+          transition: all 0.15s;
+        }
+        .nav-category-dropdown a:hover {
+          background: var(--primary-light);
           color: var(--primary);
         }
         .nav-actions {
