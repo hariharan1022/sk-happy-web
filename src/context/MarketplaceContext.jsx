@@ -1,6 +1,23 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../supabaseClient';
 
+// --- Local Product Images ---
+// Good Vibes Only T-Shirt
+import gvImg1 from '../assets/product img/t-shirt/Good Vibes Only T-Shirt/15802973667247437373_2048.webp';
+import gvImg2 from '../assets/product img/t-shirt/Good Vibes Only T-Shirt/2177243028804726841_2048.webp';
+import gvImg3 from '../assets/product img/t-shirt/Good Vibes Only T-Shirt/4169637186305631377_2048.webp';
+import gvImg4 from '../assets/product img/t-shirt/Good Vibes Only T-Shirt/5636208504996731460_2048.webp';
+import gvImg5 from '../assets/product img/t-shirt/Good Vibes Only T-Shirt/7626825762436520920_2048.webp';
+// Just Keep Moving Forward T-Shirt
+import jkmfImg1 from '../assets/product img/t-shirt/Just Keep Moving Forward T-Shirt — Motivational Inspirational Tee/14340271703261554309_2048.webp';
+import jkmfImg2 from '../assets/product img/t-shirt/Just Keep Moving Forward T-Shirt — Motivational Inspirational Tee/14640260962416754384_2048.webp';
+import jkmfImg3 from '../assets/product img/t-shirt/Just Keep Moving Forward T-Shirt — Motivational Inspirational Tee/5454580535182015097_2048.webp';
+// Power In Silence T-Shirt
+import pisImg1 from '../assets/product img/t-shirt/Power In Silence T-Shirt — Samurai Elephant Graphic Tee/Front (1).png';
+import pisImg2 from '../assets/product img/t-shirt/Power In Silence T-Shirt — Samurai Elephant Graphic Tee/Back (1).png';
+import pisImg3 from '../assets/product img/t-shirt/Power In Silence T-Shirt — Samurai Elephant Graphic Tee/power-in-silence-t-shirt-samurai-elephant-graphic-tee (1).jpg';
+import pisImg4 from '../assets/product img/t-shirt/Power In Silence T-Shirt — Samurai Elephant Graphic Tee/power-in-silence-t-shirt-samurai-elephant-graphic-tee.jpg';
+
 const MarketplaceContext = createContext();
 
 // Pre-populated data to make the marketplace look full and beautiful instantly
@@ -796,6 +813,83 @@ const INITIAL_PRODUCTS = [
     reviews: [
       { id: 'pr31a', buyerName: 'Elena R.', rating: 5, date: '2026-05-18', comment: 'An absolutely gorgeous deck! The cardstock feels very premium and the illustrations make me smile every morning.' }
     ]
+  },
+
+  // --- NEW LOCAL PRODUCT UPLOADS ---
+  {
+    id: 'prod-32',
+    name: 'Good Vibes Only T-Shirt',
+    description: 'A lightweight, breathable tee that carries a relaxed, optimistic attitude. The hand-lettered "Good Vibes Only" artwork sits bold and centered, its vintage brush strokes and banner detail lending a casual, artisan feel. Wear it to slow mornings with coffee, neighborhood walks, or low-key hangouts — it layers easily under jackets and looks intentional when paired with denim or linen. The soft ring-spun cotton and tubular knit keep the silhouette clean and comfortable all day, while the reinforced collar and shoulder tape hold shape through repeated wear.',
+    price: 31.00,
+    discount: 0,
+    stock: 40,
+    images: [gvImg1, gvImg2, gvImg3, gvImg4, gvImg5],
+    category: 'T-Shirts',
+    subcategory: 'Unisex Graphic Tees',
+    sizes: ['S', 'M', 'L', 'XL', 'XXL'],
+    colors: ['Dark Chocolate', 'Black', 'Military Green', 'Dark Heather'],
+    tags: ['t-shirt', 'good vibes', 'graphic tee', 'positive', 'casual'],
+    deliveryDetails: 'Ships in 1-2 business days. Standard tracked shipping.',
+    returnPolicy: 'Exchange within 14 days for unworn, unwashed items in original condition.',
+    careInstructions: 'Machine wash cold (max 30°C) with similar colors. Do not bleach. Tumble dry low heat. Iron low heat. Do not dryclean.',
+    productInfo: 'Gildan 64000 | 100% ring-spun cotton | Tubular knit | Oeko-Tex certified | Made in Bangladesh',
+    shopId: 'shop-1',
+    sellerId: 'user-seller-1',
+    rating: 4.8,
+    hidden: false,
+    reviews: [
+      { id: 'pr32a', buyerName: 'Jake T.', rating: 5, date: '2026-05-20', comment: 'Super soft and the print is crisp. The "Good Vibes Only" message is exactly what I needed on my tee!' }
+    ]
+  },
+  {
+    id: 'prod-33',
+    name: 'Just Keep Moving Forward T-Shirt',
+    description: 'Lightweight, soft, and unapologetically bold — this tee carries a short, steady message: Just keep moving forward. The hand-painted brush strokes and stacked typography read like a quick note you\'d pin to a mirror on a rough morning. It sits close to the body without feeling tight, breathes through busy days, and wears well under a jacket or on its own. Wear it when you need a quiet nudge to take the next step, when training for a race, or when showing up for someone who needs encouragement.',
+    price: 31.00,
+    discount: 10,
+    stock: 35,
+    images: [jkmfImg1, jkmfImg2, jkmfImg3],
+    category: 'T-Shirts',
+    subcategory: 'Unisex Graphic Tees',
+    sizes: ['S', 'M', 'L', 'XL', 'XXL'],
+    colors: ['Dark Chocolate', 'Black', 'Military Green', 'Dark Heather'],
+    tags: ['t-shirt', 'motivational', 'inspirational', 'forward', 'quote'],
+    deliveryDetails: 'Ships in 1-2 business days. Standard tracked shipping.',
+    returnPolicy: 'Exchange within 14 days for unworn, unwashed items in original condition.',
+    careInstructions: 'Machine wash cold (max 30°C) with similar colors. Do not bleach. Tumble dry low heat. Iron low heat. Do not dryclean.',
+    productInfo: 'Gildan 64000 | 100% ring-spun cotton (153 g/m²) | Tubular knit | Oeko-Tex certified | Made in Bangladesh',
+    shopId: 'shop-1',
+    sellerId: 'user-seller-1',
+    rating: 4.9,
+    hidden: false,
+    reviews: [
+      { id: 'pr33a', buyerName: 'Priya M.', rating: 5, date: '2026-05-19', comment: 'This tee is my morning motivation. Quality feels premium and print is sharp.' }
+    ]
+  },
+  {
+    id: 'prod-34',
+    name: 'Power In Silence T-Shirt — Samurai Elephant Graphic Tee',
+    description: 'This heavyweight garment-dyed tee feels like a quiet declaration. The front carries a bold, ink-splattered elephant silhouette set against a distressed red sun — raw, thoughtful, and a little rebellious. The back continues the stark brushwork and adds the phrase "POWER IN SILENCE" in vivid red strokes, turning the shirt into a wearable statement about strength, restraint, and presence. It drapes with a relaxed fit and softened color from garment-dyeing, so the shirt looks lived-in from day one.',
+    price: 34.99,
+    discount: 0,
+    stock: 25,
+    images: [pisImg1, pisImg2, pisImg3, pisImg4],
+    category: 'T-Shirts',
+    subcategory: 'Oversized Tees',
+    sizes: ['S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL'],
+    colors: ['White', 'Ivory'],
+    tags: ['t-shirt', 'samurai', 'elephant', 'graphic', 'garment dyed', 'heavyweight'],
+    deliveryDetails: 'Ships in 1-2 business days. Standard tracked shipping.',
+    returnPolicy: 'Exchange within 14 days for unworn, unwashed items in original condition.',
+    careInstructions: 'Machine wash cold (max 30°C). Do not bleach. Tumble dry low heat. Iron low heat. Do not dryclean.',
+    productInfo: 'Comfort Colors® 1717 | 100% ring-spun US cotton | 6.1 oz/yd² heavyweight | Garment-dyed finish | Made in Honduras',
+    shopId: 'shop-1',
+    sellerId: 'user-seller-1',
+    rating: 4.9,
+    hidden: false,
+    reviews: [
+      { id: 'pr34a', buyerName: 'Marco L.', rating: 5, date: '2026-05-21', comment: 'The garment dye gives it that perfect vintage feel. The elephant graphic is stunning in person.' }
+    ]
   }
 ];
 
@@ -874,7 +968,22 @@ export const MarketplaceProvider = ({ children }) => {
 
   const [products, setProducts] = useState(() => {
     const saved = localStorage.getItem('products');
-    return saved ? JSON.parse(saved) : INITIAL_PRODUCTS;
+    if (saved) {
+      try {
+        const parsed = JSON.parse(saved);
+        const parsedIds = new Set(parsed.map(p => p.id));
+        const missing = INITIAL_PRODUCTS.filter(p => !parsedIds.has(p.id));
+        if (missing.length > 0) {
+          const updated = [...parsed, ...missing];
+          localStorage.setItem('products', JSON.stringify(updated));
+          return updated;
+        }
+        return parsed;
+      } catch (e) {
+        return INITIAL_PRODUCTS;
+      }
+    }
+    return INITIAL_PRODUCTS;
   });
 
   const [chatMessages, setChatMessages] = useState(() => {
