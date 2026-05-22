@@ -54,6 +54,7 @@ export default function Home() {
   // Search & Filter state
   const searchQuery = searchParams.get('search') || '';
   const categoryQuery = searchParams.get('category') || '';
+  const [localSearch, setLocalSearch] = useState(searchQuery);
   const [priceRange, setPriceRange] = useState(50); // Max $50
   const [minRating, setMinRating] = useState(0);
   const [showFilters, setShowFilters] = useState(false);
@@ -87,6 +88,17 @@ export default function Home() {
 
   const handlePrevSlide = () => {
     setCurrentSlide((prev) => (prev - 1 + BANNER_SLIDES.length) % BANNER_SLIDES.length);
+  };
+
+  const handleSearchSubmit = (e) => {
+    e.preventDefault();
+    const newParams = new URLSearchParams(searchParams);
+    if (localSearch.trim()) {
+      newParams.set('search', localSearch.trim());
+    } else {
+      newParams.delete('search');
+    }
+    setSearchParams(newParams);
   };
 
   const selectCategory = (cat) => {
@@ -176,8 +188,8 @@ export default function Home() {
                 <input 
                   type="text" 
                   placeholder="Search custom graphic tees, birthday kits, hampers..." 
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  value={localSearch}
+                  onChange={(e) => setLocalSearch(e.target.value)}
                   className="search-input"
                   style={{
                     width: '100%',
