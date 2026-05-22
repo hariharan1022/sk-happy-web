@@ -770,6 +770,32 @@ const INITIAL_PRODUCTS = [
     rating: 4.8,
     hidden: false,
     reviews: []
+  },
+  {
+    id: 'prod-31',
+    name: 'Happy Little Things Inspirational Oracle Card Deck',
+    description: 'A beautiful deck of 32 pocket-sized inspirational oracle cards designed to bring daily joy, focus on positivity, and help you find serenity in the little things. Features lovely pastel illustrations and gentle mindfulness prompts to brighten your everyday routine.',
+    price: 18.99,
+    discount: 0,
+    stock: 50,
+    images: [
+      'https://images.unsplash.com/photo-1601049541289-9b1b7bbbfe19?w=600&auto=format&fit=crop&q=80',
+      'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=600&auto=format&fit=crop&q=80'
+    ],
+    category: 'Gifts',
+    subcategory: 'Mindfulness & Oracle Cards',
+    sizes: ['Standard Deck (88 x 125 mm)'],
+    colors: ['Pastel Rainbow Box'],
+    tags: ['oracle cards', 'inspiration', 'gift', 'positivity', 'mindfulness', 'cards'],
+    deliveryDetails: 'Ships in 1-2 business days. Packed in a sturdy, gorgeous cardboard slider box.',
+    returnPolicy: '30-day return policy for unopened and sealed decks.',
+    shopId: 'shop-3',
+    sellerId: 'user-seller-3',
+    rating: 4.9,
+    hidden: false,
+    reviews: [
+      { id: 'pr31a', buyerName: 'Elena R.', rating: 5, date: '2026-05-18', comment: 'An absolutely gorgeous deck! The cardstock feels very premium and the illustrations make me smile every morning.' }
+    ]
   }
 ];
 
