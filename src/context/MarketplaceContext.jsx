@@ -16,7 +16,9 @@ import jkmfImg3 from '../assets/product img/t-shirt/Just Keep Moving Forward T-S
 import pisImg1 from '../assets/product img/t-shirt/Power In Silence T-Shirt — Samurai Elephant Graphic Tee/Front (1).png';
 import pisImg2 from '../assets/product img/t-shirt/Power In Silence T-Shirt — Samurai Elephant Graphic Tee/Back (1).png';
 import pisImg3 from '../assets/product img/t-shirt/Power In Silence T-Shirt — Samurai Elephant Graphic Tee/power-in-silence-t-shirt-samurai-elephant-graphic-tee (1).jpg';
-import pisImg4 from '../assets/product img/t-shirt/Power In Silence T-Shirt — Samurai Elephant Graphic Tee/power-in-silence-t-shirt-samurai-elephant-graphic-tee.jpg';
+import pisImg4 from '../assets/product img/t-shirt/Power In Silence T-Shirt — Samurai Elephant Graphic Tee/power-in-silence-t-shirt-samurai-elephant-graphic-tee (2).jpg';
+import pisImg5 from '../assets/product img/t-shirt/Power In Silence T-Shirt — Samurai Elephant Graphic Tee/power-in-silence-t-shirt-samurai-elephant-graphic-tee (3).jpg';
+import pisImg6 from '../assets/product img/t-shirt/Power In Silence T-Shirt — Samurai Elephant Graphic Tee/power-in-silence-t-shirt-samurai-elephant-graphic-tee.jpg';
 
 const MarketplaceContext = createContext();
 
@@ -873,7 +875,7 @@ const INITIAL_PRODUCTS = [
     price: 34.99,
     discount: 0,
     stock: 25,
-    images: [pisImg1, pisImg2, pisImg3, pisImg4],
+    images: [pisImg1, pisImg2, pisImg3, pisImg4, pisImg5, pisImg6],
     category: 'T-Shirts',
     subcategory: 'Oversized Tees',
     sizes: ['S', 'M', 'L', 'XL', 'XXL', '3XL', '4XL'],
